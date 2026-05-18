@@ -1,1378 +1,2057 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MSJ BEAUTY STUDIO - Premium Hair, Nail & Aesthetics Lounge Prague</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSJ Beauty Studio — Premium Hair, Nail & Aesthetics Lounge · Prague</title>
+  <meta name="description" content="MSJ Beauty Studio — Premium Hair Art, Bespoke Nail Architecture & Advanced Skin Aesthetics in Prague, Rybná 716/24." />
 
-<!-- CORE LIBRARIES -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
 
-<!-- CUSTOM STYLES -->
-<style>
-  :root {
-    --msj-pink: #ffb6c1; /* Neon Pink Accent */
-    --msj-rose: #f4a7b9; /* Warm Rose Lines / Particles */
-    --msj-nacre: #fff5ee; /* Liquid Nacre Base */
-    --msj-gold: #e1c4a8; /* Pearl Rose-Gold Accent */
-    --msj-dark: #0a0a0f; /* Deep Space Dark Background */
-    --msj-mid: #12121a; /* Slightly Lighter Dark Background */
-    --glass-bg: rgba(17, 17, 25, 0.6); /* Glassmorphism Backdrop */
-    --glass-border: rgba(44, 44, 52, 0.7); /* Glassmorphism Border */
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { overflow-x: hidden; scroll-behavior: smooth; }
-  body {
-    background: var(--msj-dark);
-    color: var(--msj-nacre);
-    font-family: 'Georgia', serif; /* Premium, classic font */
-    overflow-x: hidden;
-    position: relative;
-  }
-  #canvas-container {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    z-index: 0;
-    pointer-events: none;
-  }
-  #canvas-container canvas { display: block; width: 100% !important; height: 100% !important; }
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-  /* NAVBAR */
-  #navbar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 1.2rem 2.5rem;
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--glass-bg);
-    backdrop-filter: blur(18px) saturate(160%);
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    border-bottom: 1px solid var(--glass-border);
-    transition: all 0.4s ease;
-  }
-  .logo-text {
-    font-size: 1.1rem; letter-spacing: 0.38em; text-transform: uppercase;
-    color: var(--msj-nacre); font-weight: 400;
-    background: linear-gradient(90deg, var(--msj-nacre) 0%, var(--msj-rose) 50%, var(--msj-pink) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .lang-switcher { display: flex; gap: 0.6rem; }
-  .lang-btn {
-    background: none; border: 1px solid var(--glass-border);
-    color: var(--msj-nacre); font-size: 0.72rem; letter-spacing: 0.15em;
-    padding: 0.3rem 0.7rem; cursor: pointer; border-radius: 2px;
-    transition: all 0.3s ease; text-transform: uppercase;
-  }
-  .lang-btn:hover, .lang-btn.active {
-    background: var(--msj-pink); color: var(--msj-dark);
-    border-color: var(--msj-pink);
-  }
+  <style>
+    /* =====================================================================
+       RESET & ROOT
+    ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* SECTIONS */
-  section { position: relative; z-index: 1; }
-  #hero {
-    height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center;
-    padding: 2rem;
-    background: linear-gradient(to bottom, transparent 50%, var(--msj-dark) 100%); /* Subtle fade to dark */
-    position: relative; z-index: 1; /* Ensure content is above WebGL */
-  }
-  .hero-eyebrow {
-    font-size: 0.72rem; letter-spacing: 0.5em; text-transform: uppercase;
-    color: var(--msj-pink); margin-bottom: 1.4rem; opacity: 0;
-    transform: translateY(20px);
-  }
-  .hero-title {
-    font-size: clamp(2.8rem, 7vw, 6.5rem);
-    font-weight: 300; line-height: 1.08;
-    letter-spacing: 0.04em;
-    background: linear-gradient(135deg, var(--msj-nacre), var(--msj-gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    opacity: 0; transform: translateY(30px);
-  }
-  .hero-subtitle {
-    margin-top: 1.8rem; font-size: clamp(0.9rem, 2vw, 1.15rem);
-    letter-spacing: 0.2em; text-transform: uppercase;
-    color: rgba(204,204,204,0.55); opacity: 0; transform: translateY(20px);
-  }
-  .hero-cta {
-    margin-top: 3rem; display: inline-block;
-    padding: 1rem 3rem; border: 1px solid var(--msj-pink);
-    color: var(--msj-pink); font-size: 0.78rem; letter-spacing: 0.35em;
-    text-decoration: none;
-    position: relative; overflow: hidden;
-    transition: color 0.4s ease; opacity: 0; transform: translateY(20px);
-  }
-  .hero-cta::before {
-    content: ''; position: absolute; inset: 0;
-    background: var(--msj-pink); transform: scaleX(0); transform-origin: left;
-    transition: transform 0.4s ease; z-index: -1;
-  }
-  .hero-cta:hover { color: var(--msj-dark); }
-  .hero-cta:hover::before { transform: scaleX(1); }
+    :root {
+      --cream:    #fdf8f3;
+      --ivory:    #f7f0e8;
+      --gold:     #c9a96e;
+      --gold-lt:  #e8d5b5;
+      --rose:     #d4a0a0;
+      --rose-dk:  #b07070;
+      --blush:    #ffb6c1;
+      --charcoal: #1a1614;
+      --dark:     #0e0c0b;
+      --mid:      #2e2724;
+      --muted:    #7a6e68;
+      --font-disp: 'Cormorant Garamond', serif;
+      --font-body: 'Jost', sans-serif;
+      --font-serif:'Playfair Display', serif;
+    }
 
-  /* SCROLL INDICATOR */
-  .scroll-indicator {
-    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-    opacity: 0.5; z-index: 10; /* Ensure it's visible above WebGL */
-  }
-  .scroll-indicator span {
-    font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--msj-pink);
-  }
-  .scroll-line {
-    width: 1px; height: 50px;
-    background: linear-gradient(to bottom, var(--msj-pink), transparent);
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
-  @keyframes scrollPulse {
-    0%,100% { opacity: 0.3; transform: scaleY(0.7); }
-    50% { opacity: 1; transform: scaleY(1); }
-  }
+    html {
+      scroll-behavior: auto;
+      overflow-x: hidden;
+    }
 
-  /* SERVICES SECTION */
-  #services {
-    min-height: 100vh; padding: 8rem 2rem 4rem;
-    display: flex; flex-direction: column; align-items: center;
-    position: relative; z-index: 1;
-  }
-  .section-label {
-    font-size: 0.65rem; letter-spacing: 0.55em; text-transform: uppercase;
-    color: var(--msj-pink); margin-bottom: 0.8rem;
-  }
-  .section-title {
-    font-size: clamp(1.8rem, 4.5vw, 3.8rem);
-    font-weight: 300; text-align: center; letter-spacing: 0.06em;
-    background: linear-gradient(135deg, var(--msj-nacre), var(--msj-gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 4rem;
-  }
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
 
-  /* BENTO GRID */
-  #bento-wrapper { width: 100%; max-width: 1200px; overflow: visible; } /* Overflow needed for GSAP movement */
-  .bento-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto;
-    gap: 1.5rem;
-    position: relative; /* Essential for GSAP movement */
-    transform-style: preserve-3d; /* For potential future 3D transforms */
-  }
-  @media (max-width: 900px) {
-    .bento-grid { grid-template-columns: 1fr; }
-  }
-  .bento-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 4px;
-    padding: 2.5rem 2rem;
-    position: relative; overflow: hidden;
-    transform-style: preserve-3d;
-    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
-    cursor: default;
-    will-change: transform, scale, box-shadow; /* Optimize for animation */
-  }
-  .bento-card:hover {
-    border-color: var(--msj-pink);
-    box-shadow: 0 0 40px rgba(255,182,193,0.12), 0 0 80px rgba(255,182,193,0.05);
-  }
-  .bento-card.featured {
-    grid-column: span 2;
-    background: linear-gradient(135deg, rgba(17,17,25,0.2), rgba(44,44,52,0.1));
-  }
-  @media (max-width: 900px) {
-    .bento-card.featured { grid-column: span 1; }
-  }
-  .bento-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--msj-pink), transparent);
-    opacity: 0; transition: opacity 0.4s ease;
-  }
-  .bento-card:hover::before { opacity: 1; }
-  .bento-num {
-    font-size: 0.6rem; letter-spacing: 0.4em; color: var(--msj-pink);
-    margin-bottom: 1.2rem; display: block;
-  }
-  .bento-title {
-    font-size: 1.3rem; font-weight: 300; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--msj-nacre);
-    margin-bottom: 0.8rem;
-  }
-  .bento-desc {
-    font-size: 0.85rem; line-height: 1.8;
-    color: rgba(204,204,204,0.55);
-    filter: blur(6px); transition: filter 0.6s ease;
-  }
-  .bento-card:hover .bento-desc { filter: blur(0); }
-  .bento-price {
-    margin-top: 1.5rem; font-size: 0.7rem; letter-spacing: 0.3em;
-    text-transform: uppercase; color: var(--msj-gold);
-  }
-  .bento-tag {
-    position: absolute; top: 1.2rem; right: 1.2rem;
-    font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--msj-dark); background: var(--msj-pink); padding: 0.25rem 0.6rem;
-    border-radius: 2px;
-  }
-  .bento-icon {
-    font-size: 2rem; margin-bottom: 1rem; display: block;
-    filter: drop-shadow(0 0 8px rgba(255,182,193,0.5));
-    color: var(--msj-pink);
-  }
-  .bento-icon.hair::before { content: '💇'; }
-  .bento-icon.nails::before { content: '💅'; }
-  .bento-icon.skin::before { content: '✨'; }
-  .bento-icon.color::before { content: '🎨'; }
-  .bento-icon.architecture::before { content: '🏛️'; }
-  .bento-icon.advanced::before { content: '🌟'; }
+    /* =====================================================================
+       CANVAS CONTAINER
+    ===================================================================== */
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-  /* TICKER */
-  #pulse-ticker {
-    width: 100%; overflow: hidden; padding: 1rem 0;
-    border-top: 1px solid var(--glass-border);
-    border-bottom: 1px solid var(--glass-border);
-    margin: 2rem 0; position: relative; z-index: 2;
-  }
-  .ticker-track {
-    display: flex; gap: 4rem; white-space: nowrap;
-    animation: tickerScroll 20s linear infinite;
-  }
-  .ticker-item {
-    font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
-    color: var(--msj-rose); display: flex; align-items: center; gap: 1rem;
-  }
-  .ticker-item::after { content: '◆'; color: var(--msj-pink); font-size: 0.5rem; }
-  @keyframes tickerScroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+    /* =====================================================================
+       CONTENT LAYERS
+    ===================================================================== */
+    #site-content {
+      position: relative;
+      z-index: 10;
+    }
 
-  /* DIAGONAL PARTICLE CANVAS */
-  #diag-canvas {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    z-index: 0; pointer-events: none;
-    opacity: 0; transition: opacity 0.8s ease;
-  }
-  #diag-canvas.visible { opacity: 1; }
+    /* =====================================================================
+       NAVBAR
+    ===================================================================== */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      background: rgba(14, 12, 11, 0.55);
+      backdrop-filter: blur(18px) saturate(1.4);
+      -webkit-backdrop-filter: blur(18px) saturate(1.4);
+      border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+      transition: padding 0.4s ease, background 0.4s ease;
+    }
 
-  /* ABOUT SECTION */
-  #about {
-    padding: 8rem 2rem;
-    display: flex; flex-direction: column; align-items: center;
-    position: relative; z-index: 1;
-  }
-  .about-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 4rem; max-width: 1100px; width: 100%;
-    align-items: center;
-  }
-  @media (max-width: 768px) {
-    .about-grid { grid-template-columns: 1fr; }
-  }
-  .about-text h2 {
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 300; line-height: 1.2; letter-spacing: 0.06em;
-    background: linear-gradient(135deg, var(--msj-nacre), var(--msj-gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 1.5rem;
-  }
-  .about-text p {
-    font-size: 0.9rem; line-height: 2; color: rgba(204,204,204,0.6);
-    margin-bottom: 1rem;
-  }
-  .about-visual { /* Placeholder for potential visual elements */
-      display: flex; align-items: center; justify-content: center;
-      background: var(--glass-bg); border-radius: 4px; padding: 4rem;
-      border: 1px solid var(--glass-border);
-      min-height: 300px; /* Ensure height */
-  }
+    #navbar.scrolled {
+      padding: 14px 48px;
+      background: rgba(14, 12, 11, 0.82);
+    }
 
-  /* SPECIALISTS SECTION */
-  #specialists {
-    padding: 8rem 2rem;
-    display: flex; flex-direction: column; align-items: center;
-    position: relative; z-index: 1;
-  }
-  .specialists-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem; max-width: 1200px; width: 100%; margin-top: 3rem;
-  }
-  .specialist-card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 4px; padding: 2.5rem;
-    position: relative; overflow: hidden;
-    transition: all 0.4s ease;
-  }
-  .specialist-card:hover {
-    border-color: var(--msj-pink);
-    box-shadow: 0 0 60px rgba(255,182,193,0.1);
-    transform: translateY(-4px);
-  }
-  .specialist-avatar {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--msj-pink), var(--msj-rose));
-    margin-bottom: 1.5rem;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem; color: var(--msj-dark); /* Ensure text is visible */
-    box-shadow: 0 0 30px rgba(255,182,193,0.3);
-  }
-  .specialist-name {
-    font-size: 1.1rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--msj-nacre); margin-bottom: 0.4rem;
-  }
-  .specialist-role {
-    font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
-    color: var(--msj-pink); margin-bottom: 1.2rem;
-  }
-  .specialist-bio {
-    font-size: 0.82rem; line-height: 1.9;
-    color: rgba(204,204,204,0.55);
-  }
-  .specialist-skills {
-    margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;
-  }
-  .skill-tag {
-    font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase;
-    border: 1px solid var(--glass-border); color: var(--msj-pink);
-    padding: 0.25rem 0.6rem; border-radius: 2px;
-  }
+    .nav-logo {
+      font-family: var(--font-disp);
+      font-size: 1.45rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .nav-logo span {
+      display: block;
+      font-size: 0.5rem;
+      letter-spacing: 0.35em;
+      color: var(--cream);
+      opacity: 0.65;
+      margin-top: 4px;
+      font-family: var(--font-body);
+      font-weight: 300;
+    }
 
-  /* MAP SECTION */
-  #location {
-    padding: 8rem 2rem; display: flex; flex-direction: column; align-items: center;
-    position: relative; z-index: 1;
-  }
-  .map-wrapper {
-    width: 100%; max-width: 1000px; margin-top: 3rem;
-    position: relative; border: 1px solid var(--glass-border);
-    overflow: hidden; border-radius: 4px;
-  }
-  .map-wrapper iframe {
-    width: 100%; height: 480px; display: block; border: none;
-    filter: invert(90%) hue-rotate(180deg) saturate(0.8) brightness(0.85); /* Dark mode filter */
-  }
-  .map-overlay-info {
-    position: absolute; top: 1.5rem; left: 1.5rem;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    padding: 1.5rem; max-width: 260px; border-radius: 4px;
-  }
-  .map-overlay-info h3 {
-    font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
-    color: var(--msj-pink); margin-bottom: 0.6rem;
-  }
-  .map-overlay-info p {
-    font-size: 0.8rem; line-height: 1.8;
-    color: rgba(204,204,204,0.7);
-  }
-  .map-overlay-info .address-line {
-    margin-top: 0.8rem; font-size: 0.72rem; letter-spacing: 0.15em;
-    color: var(--msj-gold);
-  }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
 
-  /* CONTACT / FOOTER */
-  #contact {
-    padding: 6rem 2rem 2rem;
-    display: flex; flex-direction: column; align-items: center;
-    border-top: 1px solid var(--glass-border);
-    position: relative; z-index: 1;
-  }
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 3rem; max-width: 1000px; width: 100%;
-    margin: 3rem 0;
-  }
-  .contact-col h4 {
-    font-size: 0.65rem; letter-spacing: 0.45em; text-transform: uppercase;
-    color: var(--msj-pink); margin-bottom: 1.2rem;
-  }
-  .contact-col p, .contact-col a {
-    font-size: 0.82rem; line-height: 2.1;
-    color: rgba(204,204,204,0.55); text-decoration: none;
-    display: block; transition: color 0.3s ease;
-  }
-  .contact-col a:hover { color: var(--msj-pink); }
-  .footer-bottom {
-    width: 100%; max-width: 1000px;
-    padding-top: 2rem;
-    border-top: 1px solid var(--glass-border);
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 1rem;
-  }
-  .footer-copy {
-    font-size: 0.62rem; letter-spacing: 0.25em;
-    color: rgba(204,204,204,0.3); text-transform: uppercase;
-  }
-  .footer-logo {
-    font-size: 0.75rem; letter-spacing: 0.4em; text-transform: uppercase;
-    background: linear-gradient(90deg, var(--msj-rose), var(--msj-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      color: var(--cream);
+      opacity: 0.7;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: opacity 0.25s, color 0.25s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
 
-  /* DIVIDER */
-  .luxury-divider {
-    width: 100%; max-width: 600px;
-    height: 1px; margin: 0 auto;
-    background: linear-gradient(90deg, transparent, var(--msj-rose), var(--msj-pink), var(--msj-rose), transparent);
-    opacity: 0.4;
-  }
+    .lang-switcher {
+      display: flex;
+      gap: 6px;
+    }
+    .lang-btn {
+      background: none;
+      border: 1px solid rgba(201,169,110,0.3);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      padding: 5px 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    .lang-btn.active,
+    .lang-btn:hover {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--dark);
+    }
 
-  /* SMOOTH REVEAL ANIMATIONS */
-  .reveal-up {
-    opacity: 0; transform: translateY(40px);
-    transition: opacity 0.9s ease, transform 0.9s ease;
-  }
-  .reveal-up.visible {
-    opacity: 1; transform: translateY(0);
-  }
-  .reveal-delay-1 { transition-delay: 0.1s; }
-  .reveal-delay-2 { transition-delay: 0.2s; }
-  .reveal-delay-3 { transition-delay: 0.3s; }
-  .reveal-delay-4 { transition-delay: 0.4s; }
+    /* =====================================================================
+       HERO SECTION
+    ===================================================================== */
+    #hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
 
-  /* LOADING SCREEN */
-  #loading {
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--msj-dark);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    transition: opacity 0.8s ease;
-  }
-  .loading-logo {
-    font-size: 0.8rem; letter-spacing: 0.6em; text-transform: uppercase;
-    background: linear-gradient(90deg, var(--msj-rose), var(--msj-pink));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 2.5rem;
-  }
-  .loading-bar-outer {
-    width: 200px; height: 1px;
-    background: rgba(204,204,204,0.1); position: relative;
-  }
-  .loading-bar-inner {
-    height: 100%; width: 0%;
-    background: linear-gradient(90deg, var(--msj-rose), var(--msj-pink));
-    transition: width 0.1s linear;
-  }
-  .loading-percent {
-    margin-top: 1rem; font-size: 0.6rem; letter-spacing: 0.4em;
-    color: rgba(204,204,204,0.3);
-  }
-</style>
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.62rem;
+      font-weight: 400;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 1s ease 0.4s forwards;
+    }
+
+    .hero-title {
+      font-family: var(--font-disp);
+      font-size: clamp(4.2rem, 9vw, 9.5rem);
+      font-weight: 300;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      color: var(--cream);
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 1.2s ease 0.65s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      margin-top: 28px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 1s ease 0.95s forwards;
+    }
+
+    .hero-sub-muted { opacity: 0.45; }
+
+    .hero-cta {
+      margin-top: 52px;
+      opacity: 0;
+      transform: translateY(16px);
+      animation: fadeUp 1s ease 1.2s forwards;
+    }
+
+    .btn-luxury {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--dark);
+      background: var(--gold);
+      padding: 16px 38px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-luxury::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.12);
+      transform: translateX(-100%);
+      transition: transform 0.35s ease;
+    }
+    .btn-luxury:hover::after { transform: translateX(0); }
+    .btn-luxury:hover { box-shadow: 0 0 40px rgba(201,169,110,0.4); }
+
+    .btn-ghost {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--gold);
+      background: transparent;
+      padding: 16px 38px;
+      border: 1px solid rgba(201,169,110,0.5);
+      cursor: pointer;
+      margin-left: 16px;
+      transition: all 0.3s ease;
+    }
+    .btn-ghost:hover {
+      background: rgba(201,169,110,0.08);
+      border-color: var(--gold);
+    }
+
+    .hero-scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.8s forwards;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, transparent, var(--gold));
+      animation: scrollPulse 2s ease infinite;
+    }
+    .scroll-label {
+      font-size: 0.56rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    /* =====================================================================
+       PARTICLE CANVAS (2D diagonal lines)
+    ===================================================================== */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+    #particle-canvas.active { opacity: 1; }
+
+    /* =====================================================================
+       SECTION GENERIC
+    ===================================================================== */
+    section {
+      position: relative;
+      z-index: 10;
+    }
+
+    .section-pad {
+      padding: 120px 48px;
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 0.6rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+
+    .section-title {
+      font-family: var(--font-disp);
+      font-size: clamp(2.6rem, 5vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--cream);
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: var(--gold);
+      margin: 28px 0;
+      opacity: 0.6;
+    }
+
+    /* =====================================================================
+       DIAGONAL DATA STRINGS
+    ===================================================================== */
+    #data-strings-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .data-string {
+      position: absolute;
+      font-family: var(--font-body);
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      white-space: nowrap;
+    }
+
+    /* =====================================================================
+       PHILOSOPHY / INTRO
+    ===================================================================== */
+    #philosophy {
+      background: transparent;
+      max-width: 860px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .philosophy-quote {
+      font-family: var(--font-disp);
+      font-size: clamp(1.5rem, 3vw, 2.6rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--cream);
+      opacity: 0.9;
+    }
+    .philosophy-quote::before { content: '\201C'; color: var(--gold); margin-right: 4px; }
+    .philosophy-quote::after  { content: '\201D'; color: var(--gold); margin-left:  4px; }
+
+    .philosophy-body {
+      margin-top: 32px;
+      font-size: 0.85rem;
+      color: var(--cream);
+      opacity: 0.55;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* =====================================================================
+       SERVICES BENTO GRID
+    ===================================================================== */
+    #services {
+      padding: 140px 48px;
+      overflow: hidden;
+    }
+
+    #services-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    #bento-grid-wrapper {
+      overflow: hidden;
+    }
+
+    #bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 16px;
+      margin-top: 64px;
+    }
+
+    .bento-card {
+      background: rgba(255,245,238,0.04);
+      border: 1px solid rgba(201,169,110,0.12);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: border-color 0.4s ease, background 0.4s ease;
+    }
+
+    .bento-card:hover {
+      border-color: rgba(201,169,110,0.35);
+      background: rgba(255,245,238,0.07);
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,169,110,0.06) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .bento-card:hover::before { opacity: 1; }
+
+    /* Tilt effect via JS */
+    .bento-card { transform-style: preserve-3d; }
+
+    .bento-card-1 { grid-column: 1 / 7; grid-row: 1; }
+    .bento-card-2 { grid-column: 7 / 13; grid-row: 1; }
+    .bento-card-3 { grid-column: 1 / 5; grid-row: 2; }
+    .bento-card-4 { grid-column: 5 / 9; grid-row: 2; }
+    .bento-card-5 { grid-column: 9 / 13; grid-row: 2; }
+    .bento-card-6 { grid-column: 1 / 13; grid-row: 3; }
+
+    .bento-number {
+      font-family: var(--font-disp);
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      opacity: 0.5;
+      margin-bottom: 20px;
+    }
+
+    .bento-icon {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      display: block;
+      opacity: 0.7;
+    }
+
+    .bento-title {
+      font-family: var(--font-disp);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+
+    .bento-desc {
+      font-size: 0.8rem;
+      color: var(--cream);
+      opacity: 0;
+      line-height: 1.8;
+      transition: opacity 0.6s ease 0.1s;
+      /* blur-to-clear reveal */
+      filter: blur(8px);
+      transition: opacity 0.7s ease, filter 0.7s ease;
+    }
+    .bento-card:hover .bento-desc {
+      opacity: 0.55;
+      filter: blur(0);
+    }
+
+    .bento-tag {
+      display: inline-block;
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201,169,110,0.3);
+      padding: 5px 12px;
+      margin-top: 20px;
+      margin-right: 8px;
+    }
+
+    .bento-price {
+      font-family: var(--font-disp);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--gold);
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+    }
+    .bento-price-label {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.35;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    /* card-6 wide layout */
+    .bento-card-6 .bento-inner {
+      display: flex;
+      align-items: center;
+      gap: 60px;
+    }
+    .bento-card-6 .bento-left { flex: 1; }
+    .bento-card-6 .bento-right {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .bento-mini {
+      border-left: 1px solid rgba(201,169,110,0.2);
+      padding-left: 20px;
+    }
+    .bento-mini-title {
+      font-family: var(--font-disp);
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 6px;
+    }
+    .bento-mini-body {
+      font-size: 0.74rem;
+      color: var(--cream);
+      opacity: 0.4;
+      line-height: 1.7;
+    }
+
+    /* =====================================================================
+       SPECIALISTS SECTION
+    ===================================================================== */
+    #specialists {
+      padding: 140px 48px;
+      background: rgba(255,245,238,0.02);
+    }
+
+    .specialists-header {
+      max-width: 1280px;
+      margin: 0 auto 72px;
+    }
+
+    .specialists-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .specialist-card {
+      border: 1px solid rgba(201,169,110,0.1);
+      padding: 52px 40px;
+      background: rgba(255,245,238,0.025);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.4s, background 0.4s;
+    }
+    .specialist-card:hover {
+      border-color: rgba(201,169,110,0.3);
+      background: rgba(255,245,238,0.05);
+    }
+
+    .specialist-index {
+      position: absolute;
+      top: 28px; right: 32px;
+      font-family: var(--font-disp);
+      font-size: 4rem;
+      font-weight: 300;
+      color: var(--gold);
+      opacity: 0.08;
+      line-height: 1;
+    }
+
+    .specialist-role {
+      font-family: var(--font-body);
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-bottom: 14px;
+    }
+
+    .specialist-name {
+      font-family: var(--font-disp);
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .specialist-detail {
+      font-size: 0.78rem;
+      color: var(--cream);
+      opacity: 0.45;
+      line-height: 1.8;
+      margin-top: 18px;
+    }
+
+    .specialist-skills {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .skill-pill {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.5;
+      border: 1px solid rgba(201,169,110,0.18);
+      padding: 4px 11px;
+    }
+
+    .specialist-accent {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .specialist-card:hover .specialist-accent { opacity: 1; }
+
+    /* =====================================================================
+       EXPERIENCE / NUMBERS
+    ===================================================================== */
+    #stats {
+      padding: 100px 48px;
+    }
+
+    .stats-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      border: 1px solid rgba(201,169,110,0.1);
+    }
+
+    .stat-item {
+      padding: 52px 40px;
+      border-right: 1px solid rgba(201,169,110,0.1);
+      text-align: center;
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-number {
+      font-family: var(--font-disp);
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-suffix {
+      font-family: var(--font-disp);
+      font-size: 1.8rem;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    .stat-label {
+      font-family: var(--font-body);
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.35;
+      margin-top: 10px;
+    }
+
+    /* =====================================================================
+       MAP SECTION
+    ===================================================================== */
+    #location {
+      padding: 140px 48px;
+    }
+
+    .location-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .location-info {}
+
+    .address-block {
+      margin-top: 36px;
+    }
+    .address-line {
+      font-family: var(--font-disp);
+      font-size: 1.5rem;
+      color: var(--cream);
+      font-weight: 300;
+      line-height: 1.4;
+    }
+    .address-detail {
+      font-size: 0.78rem;
+      color: var(--cream);
+      opacity: 0.45;
+      margin-top: 6px;
+      line-height: 1.8;
+    }
+
+    .hours-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 8px 24px;
+      margin-top: 32px;
+      font-size: 0.75rem;
+    }
+    .hours-day { color: var(--cream); opacity: 0.4; letter-spacing: 0.1em; }
+    .hours-time { color: var(--cream); opacity: 0.75; }
+
+    .map-wrapper {
+      position: relative;
+      height: 460px;
+      overflow: hidden;
+      border: 1px solid rgba(201,169,110,0.15);
+    }
+
+    .map-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      filter: invert(1) hue-rotate(180deg) saturate(0.6) brightness(0.7);
+    }
+
+    .map-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 60px rgba(14,12,11,0.7);
+    }
+
+    /* =====================================================================
+       FOOTER
+    ===================================================================== */
+    #footer {
+      padding: 80px 48px 48px;
+      border-top: 1px solid rgba(201,169,110,0.1);
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid rgba(201,169,110,0.08);
+    }
+
+    .footer-brand-name {
+      font-family: var(--font-disp);
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .footer-brand-desc {
+      font-size: 0.78rem;
+      color: var(--cream);
+      opacity: 0.35;
+      line-height: 1.9;
+      max-width: 280px;
+    }
+
+    .footer-col-title {
+      font-family: var(--font-body);
+      font-size: 0.58rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul { list-style: none; }
+    .footer-col li {
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+      color: var(--cream);
+      opacity: 0.35;
+    }
+    .footer-col a {
+      color: var(--cream);
+      opacity: 0.35;
+      text-decoration: none;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .footer-col a:hover { opacity: 0.85; color: var(--gold); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 32px;
+      font-size: 0.65rem;
+      color: var(--cream);
+      opacity: 0.22;
+      letter-spacing: 0.12em;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 20px;
+    }
+    .social-links a {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.4;
+      text-decoration: none;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .social-links a:hover { opacity: 1; color: var(--gold); }
+
+    /* =====================================================================
+       BOOKING CTA BAND
+    ===================================================================== */
+    #booking {
+      padding: 100px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #booking::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(201,169,110,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .booking-title {
+      font-family: var(--font-disp);
+      font-size: clamp(2.8rem, 6vw, 6.5rem);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .booking-title em { font-style: italic; color: var(--gold); }
+
+    .booking-sub {
+      margin-top: 20px;
+      font-size: 0.78rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0.35;
+    }
+
+    .booking-cta {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    /* =====================================================================
+       UTILITY ANIMATIONS
+    ===================================================================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.3s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+
+    /* =====================================================================
+       NOISE OVERLAY
+    ===================================================================== */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* =====================================================================
+       SCROLLBAR
+    ===================================================================== */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); opacity: 0.5; }
+
+    /* =====================================================================
+       RESPONSIVE
+    ===================================================================== */
+    @media (max-width: 1024px) {
+      #bento-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .bento-card-1 { grid-column: 1 / 7; }
+      .bento-card-2 { grid-column: 1 / 7; }
+      .bento-card-3 { grid-column: 1 / 3; }
+      .bento-card-4 { grid-column: 3 / 5; }
+      .bento-card-5 { grid-column: 5 / 7; }
+      .bento-card-6 { grid-column: 1 / 7; }
+      .bento-card-6 .bento-inner { flex-direction: column; }
+      .bento-card-6 .bento-right { grid-template-columns: 1fr 1fr; }
+
+      .specialists-grid { grid-template-columns: 1fr 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .location-inner { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+
+    @media (max-width: 768px) {
+      #navbar { padding: 18px 24px; }
+      .nav-links { display: none; }
+      .section-pad { padding: 80px 24px; }
+      #services, #specialists, #location, #footer, #booking, #stats { padding-left: 24px; padding-right: 24px; }
+      #bento-grid { grid-template-columns: 1fr; }
+      .bento-card-1, .bento-card-2, .bento-card-3,
+      .bento-card-4, .bento-card-5, .bento-card-6 { grid-column: 1; }
+      .specialists-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div id="loading">
-  <div class="loading-logo" data-i18n="logo">MSJ BEAUTY STUDIO</div>
-  <div class="loading-bar-outer">
-    <div class="loading-bar-inner" id="loading-bar"></div>
-  </div>
-  <div class="loading-percent" id="loading-percent">0%</div>
-</div>
+<!-- =====================================================================
+     NOISE TEXTURE
+===================================================================== -->
+<div class="noise-overlay" aria-hidden="true"></div>
 
-<!-- WEBGL CANVAS CONTAINER -->
-<div id="canvas-container"></div>
+<!-- =====================================================================
+     WEBGL CANVAS
+===================================================================== -->
+<div id="canvas-container" aria-hidden="true"></div>
 
-<!-- DIAGONAL PARTICLE CANVAS -->
-<canvas id="diag-canvas"></canvas>
+<!-- =====================================================================
+     2D PARTICLE CANVAS
+===================================================================== -->
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
 
-<!-- NAVBAR -->
-<nav id="navbar">
-  <div class="logo-text" data-i18n="logo">MSJ BEAUTY STUDIO</div>
-  <div class="lang-switcher">
-    <button class="lang-btn active" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('cz')">CZ</button>
-    <button class="lang-btn" onclick="setLang('ru')">RU</button>
-  </div>
-</nav>
+<!-- =====================================================================
+     DATA STRINGS
+===================================================================== -->
+<div id="data-strings-container" aria-hidden="true"></div>
 
-<!-- TICKER -->
-<div id="pulse-ticker">
-  <div class="ticker-track" id="ticker-track">
-    <span class="ticker-item">PREMIUM HAIR</span>
-    <span class="ticker-item">BESPOKE NAILS</span>
-    <span class="ticker-item">GLOW SKIN</span>
-    <span class="ticker-item">MSJ STUDIO PRAGUE</span>
-    <span class="ticker-item">HAIR COLOR</span>
-    <span class="ticker-item">NAIL ART</span>
-    <span class="ticker-item">AESTHETIC TREATMENTS</span>
-    <span class="ticker-item">BEAUTY LOUNGE</span>
-    <span class="ticker-item">PREMIUM HAIR</span>
-    <span class="ticker-item">BESPOKE NAILS</span>
-    <span class="ticker-item">GLOW SKIN</span>
-    <span class="ticker-item">MSJ STUDIO PRAGUE</span>
-    <span class="ticker-item">HAIR COLOR</span>
-    <span class="ticker-item">NAIL ART</span>
-    <span class="ticker-item">AESTHETIC TREATMENTS</span>
-    <span class="ticker-item">BEAUTY LOUNGE</span>
-  </div>
-</div>
+<!-- =====================================================================
+     SITE CONTENT
+===================================================================== -->
+<div id="site-content">
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-eyebrow" data-i18n="hero_eyebrow">Premium Hair, Nail & Aesthetics Lounge Prague</div>
-  <h1 class="hero-title" id="hero-title">MSJ STUDIO</h1>
-  <p class="hero-subtitle" data-i18n="hero_subtitle">Rybná 716/24, Old Town — Prague 1</p>
-  <a href="#services" class="hero-cta" data-i18n="hero_cta">Explore Our Services</a>
-  <div class="scroll-indicator">
-    <span data-i18n="scroll">Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
-
-<!-- ABOUT SECTION -->
-<section id="about">
-  <div class="about-grid">
-    <div class="about-text">
-      <h2 data-i18n="about_title">Where Beauty Meets\nArtistry</h2>
-      <p data-i18n="about_p1">MSJ BEAUTY STUDIO, situated in Prague's historic Old Town, is an exclusive sanctuary dedicated to the art of beauty. We offer a curated selection of premium services in hair, nails, and aesthetics, designed to enhance your natural radiance and confidence.</p>
-      <p data-i18n="about_p2">Experience a blend of cutting-edge techniques and personalized care in a luxurious setting. Our passionate artisans are committed to delivering exceptional results, ensuring every visit leaves you feeling refreshed, revitalized, and impeccably styled.</p>
-    </div>
-    <div class="about-visual">
-      <!-- Placeholder for a potential visual element, e.g., abstract shapes, product imagery etc. -->
-      <div class="relative w-full h-full flex items-center justify-center bg-[var(--glass-bg)] rounded-md border border-[var(--glass-border)] p-8">
-        <svg class="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="40" stroke="var(--msj-pink)" stroke-width="1" fill="none" class="animate-ping duration-1000 delay-500"/>
-            <circle cx="50" cy="50" r="30" stroke="var(--msj-rose)" stroke-width="0.8" fill="none" class="animate-pulse duration-800 delay-300"/>
-            <circle cx="50" cy="50" r="20" stroke="var(--msj-gold)" stroke-width="0.6" fill="none"/>
-        </svg>
-        <h3 class="text-2xl font-light tracking-widest text-[var(--msj-nacre)] text-center" data-i18n="about_visual_text">LUXURY & PRECISION</h3>
+  <!-- NAVBAR -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#hero" class="nav-logo" aria-label="MSJ Beauty Studio Home">
+      MSJ Beauty Studio
+      <span>Premium Lounge · Prague</span>
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#philosophy" data-i18n="nav_about">About</a></li>
+        <li><a href="#services" data-i18n="nav_services">Services</a></li>
+        <li><a href="#specialists" data-i18n="nav_team">Team</a></li>
+        <li><a href="#location" data-i18n="nav_location">Location</a></li>
+        <li><a href="#booking" data-i18n="nav_book">Book</a></li>
+      </ul>
+      <div class="lang-switcher" role="group" aria-label="Language selection">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="cz">CZ</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
 
-<div class="luxury-divider"></div>
-
-<!-- SERVICES -->
-<section id="services">
-  <p class="section-label" data-i18n="services_label">Our Expertise</p>
-  <h2 class="section-title" data-i18n="services_title">Signature Services</h2>
-  <div id="bento-wrapper">
-    <div class="bento-grid" id="bento-grid">
-
-      <!-- Card 1: Featured - Premium Hair Art & Color -->
-      <div class="bento-card featured reveal-up" data-tilt>
-        <span class="bento-tag" data-i18n="signature">Signature</span>
-        <span class="bento-icon hair"><span class="icon-text">💇</span></span>
-        <span class="bento-num">01 — PREMIUM HAIR</span>
-        <h3 class="bento-title" data-i18n="hair_title">Art & Color Mastery</h3>
-        <p class="bento-desc" data-i18n="hair_desc">Transform your look with our expert hair artistry. From precision cuts to vibrant color transformations and bespoke styling, we craft looks that define your personal style and enhance your natural beauty.</p>
-        <div class="bento-price" data-i18n="hair_price">From 2,000 CZK · 90 min</div>
-      </div>
-
-      <!-- Card 2: Bespoke Nail Architecture -->
-      <div class="bento-card reveal-up reveal-delay-1" data-tilt>
-        <span class="bento-icon nails"><span class="icon-text">💅</span></span>
-        <span class="bento-num">02 — BESPOKE NAILS</span>
-        <h3 class="bento-title" data-i18n="nails_title">Nail Architecture</h3>
-        <p class="bento-desc" data-i18n="nails_desc">Elevate your hands with our meticulous nail services. Offering everything from classic manicures to intricate nail art and durable gel extensions, we ensure your nails are a statement of sophistication.</p>
-        <div class="bento-price" data-i18n="nails_price">From 1,500 CZK · 75 min</div>
-      </div>
-
-      <!-- Card 3: Advanced Skin Aesthetics -->
-      <div class="bento-card reveal-up reveal-delay-2" data-tilt>
-        <span class="bento-icon skin"><span class="icon-text">✨</span></span>
-        <span class="bento-num">03 — ADVANCED SKIN</span>
-        <h3 class="bento-title" data-i18n="skin_title">Aesthetic Treatments</h3>
-        <p class="bento-desc" data-i18n="skin_desc">Rejuvenate your complexion with our advanced aesthetic treatments. Targeting hydration, anti-aging, and rejuvenation, our tailored facials and therapies reveal a luminous, balanced, and youthful glow.</p>
-        <div class="bento-price" data-i18n="skin_price">From 3,000 CZK · 100 min</div>
-      </div>
-
-      <!-- Card 4: Expert Color Application -->
-      <div class="bento-card reveal-up reveal-delay-3" data-tilt>
-        <span class="bento-icon color"><span class="icon-text">🎨</span></span>
-        <span class="bento-num">04 — EXPERT COLOR</span>
-        <h3 class="bento-title" data-i18n="color_title">Vibrant Hair Color</h3>
-        <p class="bento-desc" data-i18n="color_desc">Discover the spectrum of possibilities with our expert hair coloring services. Whether it's subtle highlights, a bold new shade, or a root touch-up, we achieve flawless, vibrant results that complement your style.</p>
-        <div class="bento-price" data-i18n="color_price">From 2,500 CZK · 120 min</div>
-      </div>
-
-      <!-- Card 5: Nail Artistry & Extensions -->
-      <div class="bento-card reveal-up reveal-delay-4" data-tilt>
-        <span class="bento-icon architecture"><span class="icon-text">🏛️</span></span>
-        <span class="bento-num">05 — NAIL ARTISTRY</span>
-        <h3 class="bento-title" data-i18n="nailart_title">Extensions & Art</h3>
-        <p class="bento-desc" data-i18n="nailart_desc">Express your individuality with our bespoke nail art and premium extensions. From minimalist elegance to elaborate designs, our technicians bring your vision to life on a flawless canvas.</p>
-        <div class="bento-price" data-i18n="nailart_price">From 1,800 CZK · 90 min</div>
-      </div>
-
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow" data-i18n="hero_eyebrow">Prague's Premier Beauty Sanctuary</div>
+    <h1 class="hero-title">
+      MSJ<br /><em>Beauty</em><br />Studio
+    </h1>
+    <p class="hero-sub">
+      <span data-i18n="hero_sub">Hair · Nail · Aesthetics</span>
+      <span class="hero-sub-muted"> &nbsp;—&nbsp; Rybná 716/24, Praha</span>
+    </p>
+    <div class="hero-cta">
+      <a href="#booking" class="btn-luxury" data-i18n="hero_cta_book">Book Your Visit</a>
+      <a href="#services" class="btn-ghost" data-i18n="hero_cta_explore">Explore Services</a>
     </div>
-  </div>
-</section>
+    <div class="hero-scroll-indicator" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span class="scroll-label">Scroll</span>
+    </div>
+  </section>
 
-<div class="luxury-divider"></div>
+  <!-- PHILOSOPHY -->
+  <section id="philosophy" class="section-pad">
+    <p class="section-label reveal" data-i18n="phil_label">Our Philosophy</p>
+    <p class="philosophy-quote reveal reveal-delay-1" data-i18n="phil_quote">
+      Beauty is not a luxury. It is a language, a ritual, a quiet act of self-definition.
+    </p>
+    <div class="divider reveal reveal-delay-2"></div>
+    <p class="philosophy-body reveal reveal-delay-2" data-i18n="phil_body">
+      At MSJ Beauty Studio, every appointment is a bespoke journey. Our atelier in the heart of Prague's historic Staré Město district fuses Central European precision with the latest global aesthetics — delivering results that are not simply beautiful, but deeply, personally yours.
+    </p>
+  </section>
 
-<!-- SPECIALISTS -->
-<section id="specialists">
-  <p class="section-label" data-i18n="spec_label">Our Talented Team</p>
-  <h2 class="section-title" data-i18n="spec_title">Meet Our Artisans</h2>
-  <div class="specialists-grid">
-
-    <div class="specialist-card reveal-up">
-      <div class="specialist-avatar">M</div>
-      <div class="specialist-name">Martin</div>
-      <div class="specialist-role" data-i18n="spec1_role">Lead Hair Stylist & Colorist</div>
-      <p class="specialist-bio" data-i18n="spec1_bio">Martin is our maestro of hair. With years of experience in avant-garde styling and complex color formulations, he crafts bespoke looks that harmonize with each client's unique features and lifestyle.</p>
-      <div class="specialist-skills">
-        <span class="skill-tag">Hair Cutting</span>
-        <span class="skill-tag">Balayage</span>
-        <span class="skill-tag">Creative Color</span>
-        <span class="skill-tag">Styling</span>
+  <!-- STATS -->
+  <section id="stats">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-count="8">0</div>
+        <div class="stat-label" data-i18n="stat_years">Years of Mastery</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-number" data-count="4200">0</div>
+        <div class="stat-label" data-i18n="stat_clients">Happy Clients</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-number" data-count="12">0</div>
+        <div class="stat-label" data-i18n="stat_artists">Specialist Artists</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-number" data-count="34">0</div>
+        <div class="stat-label" data-i18n="stat_awards">Industry Awards</div>
       </div>
     </div>
+  </section>
 
-    <div class="specialist-card reveal-up reveal-delay-1">
-      <div class="specialist-avatar" style="background: linear-gradient(135deg, var(--msj-gold), var(--msj-pink));">S</div>
-      <div class="specialist-name">Sofia</div>
-      <div class="specialist-role" data-i18n="spec2_role">Nail Art & Extension Specialist</div>
-      <p class="specialist-bio" data-i18n="spec2_bio">Sofia transforms nails into intricate works of art. Her expert hand in gel extensions, detailed nail art, and meticulous care ensures your hands always look impeccable.</p>
-      <div class="specialist-skills">
-        <span class="skill-tag">Gel Nails</span>
-        <span class="skill-tag">Nail Art</span>
-        <span class="skill-tag">Acrylics</span>
-        <span class="skill-tag">Manicures</span>
+  <!-- SERVICES -->
+  <section id="services">
+    <div id="services-inner">
+      <p class="section-label reveal" data-i18n="serv_label">Our Craft</p>
+      <h2 class="section-title reveal reveal-delay-1" data-i18n="serv_title">
+        The Art of<br /><em>Flawless Beauty</em>
+      </h2>
+      <div id="bento-grid-wrapper">
+        <div id="bento-grid">
+
+          <!-- Card 1: Hair -->
+          <div class="bento-card bento-card-1">
+            <div class="bento-number">01</div>
+            <span class="bento-icon" aria-hidden="true">✦</span>
+            <h3 class="bento-title" data-i18n="serv_hair_title">Premium Hair Art<br />&amp; Colour</h3>
+            <p class="bento-desc" data-i18n="serv_hair_desc">Our master colourists employ the most advanced European pigmentation techniques — from hand-painted balayage and precision foilayage, to vivid fashion colour and bespoke toning. Every strand is treated as a canvas. Results are bold, long-lasting, and uniquely yours.</p>
+            <span class="bento-tag" data-i18n="tag_balayage">Balayage</span>
+            <span class="bento-tag" data-i18n="tag_colour">Colour</span>
+            <span class="bento-tag" data-i18n="tag_keratin">Keratin</span>
+            <div class="bento-price">Od 1 200 Kč <span class="bento-price-label" data-i18n="from_price">From</span></div>
+          </div>
+
+          <!-- Card 2: Nails -->
+          <div class="bento-card bento-card-2">
+            <div class="bento-number">02</div>
+            <span class="bento-icon" aria-hidden="true">◆</span>
+            <h3 class="bento-title" data-i18n="serv_nail_title">Bespoke Nail<br />Architecture</h3>
+            <p class="bento-desc" data-i18n="serv_nail_desc">Nails are sculpture. Our technicians work with Japanese gel systems, BIAB overlays, and luxury chrome powders to engineer nail looks ranging from minimalist editorial to maximalist art. Structural strength meets exquisite craft.</p>
+            <span class="bento-tag" data-i18n="tag_gel">Gel System</span>
+            <span class="bento-tag" data-i18n="tag_nail_art">Nail Art</span>
+            <span class="bento-tag" data-i18n="tag_biab">BIAB</span>
+            <div class="bento-price">Od 650 Kč <span class="bento-price-label" data-i18n="from_price">From</span></div>
+          </div>
+
+          <!-- Card 3: Skin -->
+          <div class="bento-card bento-card-3">
+            <div class="bento-number">03</div>
+            <span class="bento-icon" aria-hidden="true">❋</span>
+            <h3 class="bento-title" data-i18n="serv_skin_title">Advanced Skin<br />Aesthetics</h3>
+            <p class="bento-desc" data-i18n="serv_skin_desc">Clinical-grade facial protocols including HydraFacial, microneedling, LED phototherapy and bespoke peels — curated to your skin biology. Science-backed results with a spa-level sensory experience.</p>
+            <span class="bento-tag" data-i18n="tag_facial">Facial</span>
+            <span class="bento-tag" data-i18n="tag_peel">Peels</span>
+            <div class="bento-price">Od 890 Kč <span class="bento-price-label" data-i18n="from_price">From</span></div>
+          </div>
+
+          <!-- Card 4: Lashes/Brows -->
+          <div class="bento-card bento-card-4">
+            <div class="bento-number">04</div>
+            <span class="bento-icon" aria-hidden="true">◇</span>
+            <h3 class="bento-title" data-i18n="serv_lash_title">Lash &amp; Brow<br />Design</h3>
+            <p class="bento-desc" data-i18n="serv_lash_desc">Frame your face with architectural precision. Russian volume lashes, Hybrid sets, laminations, tinting and custom brow sculpting — every detail considered for your unique facial geometry.</p>
+            <span class="bento-tag" data-i18n="tag_lash">Volume Lashes</span>
+            <span class="bento-tag" data-i18n="tag_brow">Brows</span>
+          </div>
+
+          <!-- Card 5: Rituals -->
+          <div class="bento-card bento-card-5">
+            <div class="bento-number">05</div>
+            <span class="bento-icon" aria-hidden="true">✧</span>
+            <h3 class="bento-title" data-i18n="serv_ritual_title">Luxury Beauty<br />Rituals</h3>
+            <p class="bento-desc" data-i18n="serv_ritual_desc">Full-day and half-day bespoke packages combining hair, nail, skin and wellness treatments. Designed for brides, special occasions, or simply those who value complete transformation.</p>
+            <span class="bento-tag" data-i18n="tag_bridal">Bridal</span>
+            <span class="bento-tag" data-i18n="tag_package">Packages</span>
+          </div>
+
+          <!-- Card 6: Wide feature -->
+          <div class="bento-card bento-card-6">
+            <div class="bento-inner">
+              <div class="bento-left">
+                <div class="bento-number">The Experience</div>
+                <h3 class="bento-title" data-i18n="serv_exp_title">Why MSJ<br /><em>is Different</em></h3>
+                <div class="divider"></div>
+                <p class="bento-desc" style="opacity:0.5; filter:none;" data-i18n="serv_exp_desc">In a city of old-world elegance, we build new-world beauty. MSJ is not simply a salon — it is a curated space where each visit is a multi-sensory ritual of care, precision and renewal.</p>
+              </div>
+              <div class="bento-right">
+                <div class="bento-mini">
+                  <div class="bento-mini-title" data-i18n="feat_1_title">Multilingual Team</div>
+                  <div class="bento-mini-body" data-i18n="feat_1_body">Czech, English, Russian speaking specialists. No language barrier in your beauty journey.</div>
+                </div>
+                <div class="bento-mini">
+                  <div class="bento-mini-title" data-i18n="feat_2_title">Premium Products</div>
+                  <div class="bento-mini-body" data-i18n="feat_2_body">Exclusively professional-grade: Wella, Schwarzkopf, Luxio, Aprés, La Mer Skincare protocols.</div>
+                </div>
+                <div class="bento-mini">
+                  <div class="bento-mini-title" data-i18n="feat_3_title">Flexible Booking</div>
+                  <div class="bento-mini-body" data-i18n="feat_3_body">Online, WhatsApp, Instagram DM or walk-in welcome. Evening & weekend slots available.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /#bento-grid -->
+      </div><!-- /#bento-grid-wrapper -->
+    </div>
+  </section>
+
+  <!-- SPECIALISTS -->
+  <section id="specialists">
+    <div class="specialists-header">
+      <p class="section-label reveal" data-i18n="team_label">The Artists</p>
+      <h2 class="section-title reveal reveal-delay-1" data-i18n="team_title">Meet Your<br /><em>Specialists</em></h2>
+      <div class="divider reveal reveal-delay-2"></div>
+      <p class="reveal reveal-delay-2" style="font-size:0.82rem; opacity:0.45; max-width:480px; line-height:1.9;" data-i18n="team_sub">Each member of the MSJ atelier holds international certifications and a personal commitment to continuous mastery of their craft.</p>
+    </div>
+    <div class="specialists-grid">
+
+      <!-- Specialist 1 -->
+      <div class="specialist-card reveal">
+        <div class="specialist-index" aria-hidden="true">01</div>
+        <div class="specialist-role" data-i18n="sp1_role">Senior Colourist & Creative Director</div>
+        <div class="specialist-name">Monika<br />Ševčíková</div>
+        <p class="specialist-detail" data-i18n="sp1_detail">With 12 years at the forefront of Czech hair artistry, Monika has shaped colour editorial work for Prague Fashion Week and trained under the legendary L'Oréal Professionnel Master Colour Academy in Paris. Her signature approach fuses Scandinavian naturalism with bold Central European flair.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">Balayage</span>
+          <span class="skill-pill">Vivid Colour</span>
+          <span class="skill-pill">Hair Sculpture</span>
+          <span class="skill-pill">Toning</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+      <!-- Specialist 2 -->
+      <div class="specialist-card reveal reveal-delay-1">
+        <div class="specialist-index" aria-hidden="true">02</div>
+        <div class="specialist-role" data-i18n="sp2_role">Nail Architect & Educator</div>
+        <div class="specialist-name">Sofiya<br />Marchenko</div>
+        <p class="specialist-detail" data-i18n="sp2_detail">Sofiya is recognised as one of the top nail architects in Central Europe, holding BIAB and Japanese Gel certifications from Tokyo and Vienna. Her work appears in Vogue CS and Elle.cz. She leads MSJ's nail education programme, training the next generation of technicians to meet our uncompromising standards.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">BIAB</span>
+          <span class="skill-pill">Gel Art</span>
+          <span class="skill-pill">Chrome</span>
+          <span class="skill-pill">3D Nail Design</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+      <!-- Specialist 3 -->
+      <div class="specialist-card reveal reveal-delay-2">
+        <div class="specialist-index" aria-hidden="true">03</div>
+        <div class="specialist-role" data-i18n="sp3_role">Skin Aesthetician & Wellness Curator</div>
+        <div class="specialist-name">Jana<br />Procházková</div>
+        <p class="specialist-detail" data-i18n="sp3_detail">A licensed clinical aesthetician with training in London and Vienna, Jana specialises in advanced skin transformation protocols. Her patient, science-driven approach has earned her a dedicated clientele who trust her with their most intimate skin concerns. She curates all MSJ skincare product selections.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">HydraFacial</span>
+          <span class="skill-pill">Microneedling</span>
+          <span class="skill-pill">LED Therapy</span>
+          <span class="skill-pill">Peels</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+      <!-- Specialist 4 -->
+      <div class="specialist-card reveal reveal-delay-3">
+        <div class="specialist-index" aria-hidden="true">04</div>
+        <div class="specialist-role" data-i18n="sp4_role">Lash Artist & Brow Sculptor</div>
+        <div class="specialist-name">Kristýna<br />Horáková</div>
+        <p class="specialist-detail" data-i18n="sp4_detail">Kristýna brings architectural precision to every lash set and brow design, having honed her skills through three years apprenticeship at premium London and Prague studios. She is certified in Russian Volume, Classic, Hybrid and Mega Volume lash application, and holds IBBD accreditation for brow design.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">Russian Volume</span>
+          <span class="skill-pill">Hybrid Lash</span>
+          <span class="skill-pill">Brow Lamination</span>
+          <span class="skill-pill">Tinting</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+      <!-- Specialist 5 -->
+      <div class="specialist-card reveal">
+        <div class="specialist-index" aria-hidden="true">05</div>
+        <div class="specialist-role" data-i18n="sp5_role">Hair Stylist & Texture Specialist</div>
+        <div class="specialist-name">Elena<br />Voloshyna</div>
+        <p class="specialist-detail" data-i18n="sp5_detail">Elena's mastery over hair texture and movement is unparalleled in the studio. Trained in Kyiv, Berlin and Milan, she is a certified Keratin Complex and Olaplex Pro stylist. Her cuts and styling work is known for effortless, editorial-calibre finish that suits both runways and everyday life.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">Precision Cut</span>
+          <span class="skill-pill">Keratin</span>
+          <span class="skill-pill">Olaplex</span>
+          <span class="skill-pill">Bridal</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+      <!-- Specialist 6 -->
+      <div class="specialist-card reveal reveal-delay-1">
+        <div class="specialist-index" aria-hidden="true">06</div>
+        <div class="specialist-role" data-i18n="sp6_role">Makeup Artist & Beauty Consultant</div>
+        <div class="specialist-name">Tereza<br />Blahová</div>
+        <p class="specialist-detail" data-i18n="sp6_detail">Tereza's background spans editorial, film, and high-end wedding makeup across Prague, Vienna and Dubai. She carries advanced certifications in airbrush technique and corrective makeup. At MSJ, she also consults clients on personalised beauty regimes, acting as each guest's long-term aesthetic partner.</p>
+        <div class="specialist-skills">
+          <span class="skill-pill">Editorial</span>
+          <span class="skill-pill">Airbrush</span>
+          <span class="skill-pill">Bridal</span>
+          <span class="skill-pill">Consultation</span>
+        </div>
+        <div class="specialist-accent"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BOOKING CTA -->
+  <section id="booking">
+    <p class="section-label reveal" data-i18n="book_label">Reserve Your Time</p>
+    <h2 class="booking-title reveal reveal-delay-1" data-i18n="book_title">Begin Your<br /><em>Transformation</em></h2>
+    <p class="booking-sub reveal reveal-delay-2" data-i18n="book_sub">Prague · Rybná 716/24 · By appointment & walk-in</p>
+    <div class="booking-cta reveal reveal-delay-3">
+      <a href="https://wa.me/420000000000" class="btn-luxury" data-i18n="book_whatsapp">WhatsApp Booking</a>
+      <a href="mailto:info@msjbeautystudio.cz" class="btn-ghost" data-i18n="book_email">Send Email</a>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="location">
+    <div class="location-inner">
+      <div class="location-info">
+        <p class="section-label reveal" data-i18n="loc_label">Find Us</p>
+        <h2 class="section-title reveal reveal-delay-1" data-i18n="loc_title">At the Heart<br /><em>of Prague</em></h2>
+        <div class="divider reveal reveal-delay-2"></div>
+        <div class="address-block reveal reveal-delay-2">
+          <div class="address-line">Rybná 716/24</div>
+          <div class="address-line">110 00 Praha 1</div>
+          <div class="address-line">Staré Město</div>
+          <p class="address-detail" data-i18n="loc_detail">
+            Step into our atelier moments from the Old Town Square. Easily accessible via metro Náměstí Republiky (Line B) — a 2-minute walk. Street parking available on Rybná and nearby Dlouhá.
+          </p>
+        </div>
+        <div class="hours-grid reveal reveal-delay-3">
+          <span class="hours-day" data-i18n="day_mon">Monday</span><span class="hours-time">10:00 – 19:00</span>
+          <span class="hours-day" data-i18n="day_tue">Tuesday</span><span class="hours-time">10:00 – 19:00</span>
+          <span class="hours-day" data-i18n="day_wed">Wednesday</span><span class="hours-time">10:00 – 20:00</span>
+          <span class="hours-day" data-i18n="day_thu">Thursday</span><span class="hours-time">10:00 – 20:00</span>
+          <span class="hours-day" data-i18n="day_fri">Friday</span><span class="hours-time">09:00 – 19:00</span>
+          <span class="hours-day" data-i18n="day_sat">Saturday</span><span class="hours-time">09:00 – 17:00</span>
+          <span class="hours-day" data-i18n="day_sun">Sunday</span><span class="hours-time" data-i18n="closed">Closed</span>
+        </div>
+      </div>
+      <div class="map-wrapper reveal reveal-delay-2">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2560.0948889034965!2d14.420773315746614!3d50.08858127942764!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b94e9b0e8fb25%3A0x42b7bafbdd35cd27!2sRybn%C3%A1%20716%2F24%2C%20110%2000%20Star%C3%A9%20M%C4%9Bsto!5e0!3m2!1sen!2scz!4v1699000000000!5m2!1sen!2scz"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="MSJ Beauty Studio location map"
+        ></iframe>
+        <div class="map-overlay"></div>
       </div>
     </div>
+  </section>
 
-    <div class="specialist-card reveal-up reveal-delay-2">
-      <div class="specialist-avatar" style="background: linear-gradient(135deg, var(--msj-nacre), var(--msj-gold));">L</div>
-      <div class="specialist-name">Lena</div>
-      <div class="specialist-role" data-i18n="spec3_role">Aesthetics & Skincare Expert</div>
-      <p class="specialist-bio" data-i18n="spec3_bio">Lena offers a rejuvenating experience for your skin. With a deep understanding of skincare science and advanced aesthetic treatments, she guides clients towards a healthier, more radiant complexion.</p>
-      <div class="specialist-skills">
-        <span class="skill-tag">Facial Treatments</span>
-        <span class="skill-tag">Microneedling</span>
-        <span class="skill-tag">Peels</span>
-        <span class="skill-tag">HydraFacial</span>
+  <!-- FOOTER -->
+  <footer id="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div>
+          <div class="footer-brand-name">MSJ Beauty Studio</div>
+          <p class="footer-brand-desc" data-i18n="footer_desc">
+            Premium Hair Art, Bespoke Nail Architecture & Advanced Skin Aesthetics in the heart of Prague. Where precision meets artistry.
+          </p>
+          <div class="social-links" style="margin-top:28px;">
+            <a href="#" aria-label="Instagram">Instagram</a>
+            <a href="#" aria-label="Facebook">Facebook</a>
+            <a href="#" aria-label="WhatsApp">WhatsApp</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_services">Services</div>
+          <ul>
+            <li><a href="#services" data-i18n="hair_art">Hair Art &amp; Colour</a></li>
+            <li><a href="#services" data-i18n="nail_arch">Nail Architecture</a></li>
+            <li><a href="#services" data-i18n="skin_aes">Skin Aesthetics</a></li>
+            <li><a href="#services" data-i18n="lash_brow">Lash &amp; Brow</a></li>
+            <li><a href="#services" data-i18n="bridal_pkg">Bridal Packages</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_contact">Contact</div>
+          <ul>
+            <li>Rybná 716/24, Praha 1</li>
+            <li>+420 000 000 000</li>
+            <li>info@msjbeautystudio.cz</li>
+            <li style="margin-top:12px; font-size:0.68rem; opacity:0.28; letter-spacing:0.1em;">IČ: 00000000</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_legal">Info</div>
+          <ul>
+            <li><a href="#" data-i18n="privacy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="terms">Terms of Service</a></li>
+            <li><a href="#" data-i18n="cookies">Cookie Settings</a></li>
+            <li><a href="#" data-i18n="gift_card">Gift Cards</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 MSJ Beauty Studio s.r.o. All rights reserved.</span>
+        <span data-i18n="footer_made">Crafted with precision in Prague.</span>
       </div>
     </div>
+  </footer>
 
-  </div>
-</section>
+</div><!-- /#site-content -->
 
-<div class="luxury-divider"></div>
-
-<!-- LOCATION / MAP -->
-<section id="location">
-  <p class="section-label" data-i18n="loc_label">Visit Our Studio</p>
-  <h2 class="section-title" data-i18n="loc_title">Prague — Rybná 716/24</h2>
-  <div class="map-wrapper">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2795.780774057619!2d14.423543299999999!3d50.0876292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470b94cdd38570bb%3A0xe65cd79a17a7d003!2sRybn%C3%A1%20716%2F24%2C%20110%2000%20Praha%201-Star%C3%A9%20M%C4%9Bsto%2C%20Czechia!5e0!3m2!1sen!2scz!4v1670835900000!5m2!1sen!2scz"
-      allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      title="MSJ BEAUTY STUDIO - Rybná 716/24">
-    </iframe>
-    <div class="map-overlay-info">
-      <h3 data-i18n="studio_label">The Lounge</h3>
-      <p class="text-white">MSJ BEAUTY STUDIO<br>Hair, Nail & Aesthetics</p>
-      <p class="address-line">Rybná 716/24<br>110 00 Old Town<br>Prague 1, Czech Republic</p>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT / FOOTER -->
-<section id="contact">
-  <p class="section-label" data-i18n="contact_label">Book Your Transformation</p>
-  <h2 class="section-title" data-i18n="contact_title">Your Beauty Journey Starts Here</h2>
-  <div class="contact-grid">
-    <div class="contact-col">
-      <h4 data-i18n="studio_info">Studio</h4>
-      <p>MSJ BEAUTY STUDIO</p>
-      <p>Rybná 716/24</p>
-      <p>110 00 Old Town</p>
-      <p>Prague 1, Czech Republic</p>
-    </div>
-    <div class="contact-col">
-      <h4 data-i18n="hours_label">Hours</h4>
-      <p data-i18n="hours_mon">Mon – Fri: 10:00 – 19:00</p>
-      <p data-i18n="hours_sat">Saturday: 10:00 – 17:00</p>
-      <p data-i18n="hours_sun">Sunday: Closed</p>
-    </div>
-    <div class="contact-col">
-      <h4 data-i18n="contact_info">Contact</h4>
-      <a href="tel:+420000000000">+420 000 000 000</a>
-      <a href="mailto:hello@msjbeauty.cz">hello@msjbeauty.cz</a>
-      <a href="#" data-i18n="social_link">@msjbeauty.prague · Instagram</a>
-    </div>
-    <div class="contact-col">
-      <h4 data-i18n="languages_label">Languages</h4>
-      <p>English</p>
-      <p>Čeština</p>
-      <p>Русский</p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <div class="footer-copy" data-i18n="copyright">© 2024 MSJ BEAUTY STUDIO. All rights reserved.</div>
-    <div class="footer-logo">MSJ BEAUTY</div>
-  </div>
-</section>
-
+<!-- =====================================================================
+     JAVASCRIPT
+===================================================================== -->
 <script>
-// ======================================================
-// LANGUAGE DICTIONARY
-// ======================================================
-const i18n = {
-  en: {
-    logo: "MSJ BEAUTY STUDIO",
-    hero_eyebrow: "Premium Hair, Nail & Aesthetics Lounge Prague",
-    hero_subtitle: "Rybná 716/24, Old Town — Prague 1",
-    hero_cta: "Explore Our Services",
-    scroll: "Scroll",
-    about_title: "Where Beauty Meets\nArtistry",
-    about_p1: "MSJ BEAUTY STUDIO, situated in Prague's historic Old Town, is an exclusive sanctuary dedicated to the art of beauty. We offer a curated selection of premium services in hair, nails, and aesthetics, designed to enhance your natural radiance and confidence.",
-    about_p2: "Experience a blend of cutting-edge techniques and personalized care in a luxurious setting. Our passionate artisans are committed to delivering exceptional results, ensuring every visit leaves you feeling refreshed, revitalized, and impeccably styled.",
-    about_visual_text: "LUXURY & PRECISION",
-    services_label: "Our Expertise",
-    services_title: "Signature Services",
-    signature: "Signature",
-    hair_title: "Art & Color Mastery",
-    hair_desc: "Transform your look with our expert hair artistry. From precision cuts to vibrant color transformations and bespoke styling, we craft looks that define your personal style and enhance your natural beauty.",
-    hair_price: "From 2,000 CZK · 90 min",
-    nails_title: "Nail Architecture",
-    nails_desc: "Elevate your hands with our meticulous nail services. Offering everything from classic manicures to intricate nail art and durable gel extensions, we ensure your nails are a statement of sophistication.",
-    nails_price: "From 1,500 CZK · 75 min",
-    skin_title: "Aesthetic Treatments",
-    skin_desc: "Rejuvenate your complexion with our advanced aesthetic treatments. Targeting hydration, anti-aging, and rejuvenation, our tailored facials and therapies reveal a luminous, balanced, and youthful glow.",
-    skin_price: "From 3,000 CZK · 100 min",
-    color_title: "Vibrant Hair Color",
-    color_desc: "Discover the spectrum of possibilities with our expert hair coloring services. Whether it's subtle highlights, a bold new shade, or a root touch-up, we achieve flawless, vibrant results that complement your style.",
-    color_price: "From 2,500 CZK · 120 min",
-    nailart_title: "Extensions & Art",
-    nailart_desc: "Express your individuality with our bespoke nail art and premium extensions. From minimalist elegance to elaborate designs, our technicians bring your vision to life on a flawless canvas.",
-    nailart_price: "From 1,800 CZK · 90 min",
-    spec_label: "Our Talented Team",
-    spec_title: "Meet Our Artisans",
-    spec1_role: "Lead Hair Stylist & Colorist",
-    spec1_bio: "Martin is our maestro of hair. With years of experience in avant-garde styling and complex color formulations, he crafts bespoke looks that harmonize with each client's unique features and lifestyle.",
-    spec2_role: "Nail Art & Extension Specialist",
-    spec2_bio: "Sofia transforms nails into intricate works of art. Her expert hand in gel extensions, detailed nail art, and meticulous care ensures your hands always look impeccable.",
-    spec3_role: "Aesthetics & Skincare Expert",
-    spec3_bio: "Lena offers a rejuvenating experience for your skin. With a deep understanding of skincare science and advanced aesthetic treatments, she guides clients towards a healthier, more radiant complexion.",
-    loc_label: "Visit Our Studio",
-    loc_title: "Prague — Rybná 716/24",
-    studio_label: "The Lounge",
-    studio_desc: "MSJ BEAUTY STUDIO\nHair, Nail & Aesthetics",
-    contact_label: "Book Your Transformation",
-    contact_title: "Your Beauty Journey Starts Here",
-    studio_info: "Studio",
-    hours_label: "Hours",
-    hours_mon: "Mon – Fri: 10:00 – 19:00",
-    hours_sat: "Saturday: 10:00 – 17:00",
-    hours_sun: "Sunday: Closed",
-    contact_info: "Contact",
-    social_link: "@msjbeauty.prague · Instagram",
-    languages_label: "Languages",
-    copyright: "© 2024 MSJ BEAUTY STUDIO. All rights reserved."
-  },
-  cz: {
-    logo: "MSJ BEAUTY STUDIO",
-    hero_eyebrow: "Prémiový Salon pro Vlasy, Nehty & Estetiku Praha",
-    hero_subtitle: "Rybná 716/24, Staré Město — Praha 1",
-    hero_cta: "Prohlédněte Si Naše Služby",
-    scroll: "Scrollovat",
-    about_title: "Kde se Krása\nSetkává s Uměním",
-    about_p1: "MSJ BEAUTY STUDIO v historickém Starém Městě Prahy je exkluzivní útočiště. Nabízíme prémiové služby pro vlasy, nehty a estetiku, navržené tak, aby podtrhly vaši přirozenou záři a sebevědomí.",
-    about_p2: "Zažijte směsici nejmodernějších technik a osobní péče v luxusním prostředí. Naši umělci se zavazují k výjimečným výsledkům, abyste se cítili svěží a revitalizovaní.",
-    about_visual_text: "LUXUS A PŘESNOST",
-    services_label: "Naše Odbornost",
-    services_title: "Klíčové Služby",
-    signature: "Podpis",
-    hair_title: "Mistrovství Vlasového Umění & Barvení",
-    hair_desc: "Proměňte svůj vzhled s naším uměním. Od precizních střihů po zářivé barvy a styling, vytváříme vzhledy, které definují váš osobní styl.",
-    hair_price: "Od 2 000 Kč · 90 min",
-    nails_title: "Architektura Nehtů",
-    nails_desc: "Pozvedněte své ruce. Nabízíme vše od klasických manikúr po složitou uměleckou tvorbu nehtů a gelové prodlužování.",
-    nails_price: "Od 1 500 Kč · 75 min",
-    skin_title: "Estetická Ošetření",
-    skin_desc: "Omladněte svou pleť. Naše pokročilá ošetření se zaměřují na hydrataci, anti-aging a regeneraci pro dosažení zářivé pleti.",
-    skin_price: "Od 3 000 Kč · 100 min",
-    color_title: "Zářivé Barvení Vlasů",
-    color_desc: "Objevte spektrum možností s našimi službami barvení vlasů. Dosahujeme bezchybných, živých výsledků, které doplňují váš styl.",
-    color_price: "Od 2 500 Kč · 120 min",
-    nailart_title: "Prodlužování & Umění Nehtů",
-    nailart_desc: "Vyjádřete svou individualitu s naším uměním a prémiovým prodlužováním nehtů. Od minimalismu po složité designy, naši technici oživují vaši vizi.",
-    nailart_price: "Od 1 800 Kč · 90 min",
-    spec_label: "Náš Talentovaný Tým",
-    spec_title: "Poznejte Naše Umělce",
-    spec1_role: "Hlavní Kadeřník & Kolorista",
-    spec1_bio: "Martin je naším kadeřnickým mágem. Vytváří individuální styly, které ladí s jedinečnými rysy a životním stylem každého klienta.",
-    spec2_role: "Specialistka na Umění Nehtů & Prodlužování",
-    spec2_bio: "Sofia proměňuje nehty v složitá umělecká díla. Její zručnost v gelových prodlužováních a detailním umění zajišťuje, že vaše ruce vypadají vždy bezchybně.",
-    spec3_role: "Expertka na Estetiku & Péči o Pleť",
-    spec3_bio: "Lena nabízí omlazující zážitek pro vaši pleť. Pomáhá klientům dosáhnout zdravější a zářivější pleti pomocí pokročilých ošetření.",
-    loc_label: "Navštivte Naše Studio",
-    loc_title: "Praha — Rybná 716/24",
-    studio_label: "Lounge",
-    studio_desc: "MSJ BEAUTY STUDIO\nVlasy, Nehty & Estetika",
-    contact_label: "Objednejte Svou Proměnu",
-    contact_title: "Vaše Cesta ke Kráse Začíná Zde",
-    studio_info: "Studio",
-    hours_label: "Otevírací Doba",
-    hours_mon: "Po – Pá: 10:00 – 19:00",
-    hours_sat: "Sobota: 10:00 – 17:00",
-    hours_sun: "Neděle: Zavřeno",
-    contact_info: "Kontakt",
-    social_link: "@msjbeauty.prague · Instagram",
-    languages_label: "Jazyky",
-    copyright: "© 2024 MSJ BEAUTY STUDIO. Všechna práva vyhrazena."
-  },
-  ru: {
-    logo: "MSJ BEAUTY STUDIO",
-    hero_eyebrow: "Премиум Салон Волос, Ногтей & Эстетики Прага",
-    hero_subtitle: "Rybná 716/24, Старый Город — Прага 1",
-    hero_cta: "Посмотреть Услуги",
-    scroll: "Прокрутить",
-    about_title: "Где Красота\nВстречается с Мастерством",
-    about_p1: "MSJ BEAUTY STUDIO, расположенное в историческом Старом Городе Праги, — это эксклюзивное убежище, посвященное искусству красоты. Мы предлагаем премиальные услуги для волос, ногтей и эстетики, разработанные для усиления вашего естественного сияния.",
-    about_p2: "Ощутите сочетание передовых техник и индивидуального ухода в роскошной обстановке. Наши мастера стремятся к превосходным результатам, чтобы вы чувствовали себя обновленными и стильными.",
-    about_visual_text: "РОСКОШЬ И ТОЧНОСТЬ",
-    services_label: "Наша Экспертиза",
-    services_title: "Основные Услуги",
-    signature: "Авторское",
-    hair_title: "Мастерство Волос & Окрашивания",
-    hair_desc: "Преобразите свой образ с нашим парикмахерским искусством. От точных стрижек до ярких окрашиваний и индивидуального стайлинга, мы создаем образы, которые подчеркнут ваш стиль.",
-    hair_price: "От 2 000 CZK · 90 мин",
-    nails_title: "Архитектура Ногтей",
-    nails_desc: "Улучшите свои руки с нашими услугами маникюра. От классического маникюра до сложного нейл-арта и гелевых наращиваний — ваши ногти станут воплощением утонченности.",
-    nails_price: "От 1 500 CZK · 75 мин",
-    skin_title: "Эстетические Процедуры",
-    skin_desc: "Омолодите свою кожу. Наши передовые процедуры направлены на увлажнение, борьбу со старением и регенерацию, раскрывая сияющий и молодой цвет лица.",
-    skin_price: "От 3 000 CZK · 100 min",
-    color_title: "Яркое Окрашивание Волос",
-    color_desc: "Откройте для себя мир цвета с нашими услугами окрашивания волос. Мы добиваемся безупречных, ярких результатов, которые дополняют ваш стиль.",
-    color_price: "От 2 500 CZK · 120 min",
-    nailart_title: "Наращивание & Арт Ногтей",
-    nailart_desc: "Выразите свою индивидуальность с помощью нашего нейл-арта и премиального наращивания. От минимализма до сложных дизайнов, наши мастера воплотят ваше видение.",
-    nailart_price: "От 1 800 CZK · 90 min",
-    spec_label: "Познакомьтесь с Художниками",
-    spec_title: "Наша Экспертная Команда",
-    spec1_role: "Ведущий Стилист & Колорист",
-    spec1_bio: "Мартин — наш мастер волос. Он создает индивидуальные образы, соответствующие уникальным чертам и образу жизни каждого клиента.",
-    spec2_role: "Специалист по Нейл-Арту & Наращиванию",
-    spec2_bio: "София превращает ногти в сложные произведения искусства. Ее экспертные навыки в гелевом наращивании и детальном нейл-арте гарантируют, что ваши руки всегда выглядят безупречно.",
-    spec3_role: "Эксперт по Эстетике & Уходу за Кожей",
-    spec3_bio: "Лена предлагает омолаживающий уход за кожей. Помогает клиентам добиться более здорового и сияющего цвета лица с помощью передовых процедур.",
-    loc_label: "Посетите Нашу Студию",
-    loc_title: "Прага — Rybná 716/24",
-    studio_label: "Салон",
-    studio_desc: "MSJ BEAUTY STUDIO\nВолосы, Ногти & Эстетика",
-    contact_label: "Запишитесь на Преображение",
-    contact_title: "Ваше Путешествие к Красоте Начинается Здесь",
-    studio_info: "Студия",
-    hours_label: "Часы Работы",
-    hours_mon: "Пн – Пт: 10:00 – 19:00",
-    hours_sat: "Суббота: 10:00 – 17:00",
-    hours_sun: "Воскресенье: Закрыто",
-    contact_info: "Контакт",
-    social_link: "@msjbeauty.prague · Instagram",
-    languages_label: "Языки",
-    copyright: "© 2024 MSJ BEAUTY STUDIO. Все права защищены."
-  }
-};
+(function() {
+  'use strict';
 
-let currentLang = 'en';
-function setLang(lang) {
-  currentLang = lang;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (i18n[lang] && i18n[lang][key] !== undefined) {
-      el.textContent = i18n[lang][key];
+  /* ===========================================================
+     TRANSLATIONS DICTIONARY
+  =========================================================== */
+  const I18N = {
+    en: {
+      nav_about: 'About',
+      nav_services: 'Services',
+      nav_team: 'Team',
+      nav_location: 'Location',
+      nav_book: 'Book',
+      hero_eyebrow: "Prague's Premier Beauty Sanctuary",
+      hero_sub: 'Hair · Nail · Aesthetics',
+      hero_cta_book: 'Book Your Visit',
+      hero_cta_explore: 'Explore Services',
+      phil_label: 'Our Philosophy',
+      phil_quote: 'Beauty is not a luxury. It is a language, a ritual, a quiet act of self-definition.',
+      phil_body: "At MSJ Beauty Studio, every appointment is a bespoke journey. Our atelier in the heart of Prague's historic Staré Město district fuses Central European precision with the latest global aesthetics — delivering results that are not simply beautiful, but deeply, personally yours.",
+      stat_years: 'Years of Mastery',
+      stat_clients: 'Happy Clients',
+      stat_artists: 'Specialist Artists',
+      stat_awards: 'Industry Awards',
+      serv_label: 'Our Craft',
+      serv_title: 'The Art of Flawless Beauty',
+      serv_hair_title: 'Premium Hair Art & Colour',
+      serv_hair_desc: 'Our master colourists employ the most advanced European pigmentation techniques — from hand-painted balayage and precision foilayage, to vivid fashion colour and bespoke toning. Every strand is treated as a canvas. Results are bold, long-lasting, and uniquely yours.',
+      serv_nail_title: 'Bespoke Nail Architecture',
+      serv_nail_desc: 'Nails are sculpture. Our technicians work with Japanese gel systems, BIAB overlays, and luxury chrome powders to engineer nail looks ranging from minimalist editorial to maximalist art. Structural strength meets exquisite craft.',
+      serv_skin_title: 'Advanced Skin Aesthetics',
+      serv_skin_desc: 'Clinical-grade facial protocols including HydraFacial, microneedling, LED phototherapy and bespoke peels — curated to your skin biology. Science-backed results with a spa-level sensory experience.',
+      serv_lash_title: 'Lash & Brow Design',
+      serv_lash_desc: 'Frame your face with architectural precision. Russian volume lashes, Hybrid sets, laminations, tinting and custom brow sculpting — every detail considered for your unique facial geometry.',
+      serv_ritual_title: 'Luxury Beauty Rituals',
+      serv_ritual_desc: 'Full-day and half-day bespoke packages combining hair, nail, skin and wellness treatments. Designed for brides, special occasions, or simply those who value complete transformation.',
+      serv_exp_title: 'Why MSJ is Different',
+      serv_exp_desc: 'In a city of old-world elegance, we build new-world beauty. MSJ is not simply a salon — it is a curated space where each visit is a multi-sensory ritual of care, precision and renewal.',
+      feat_1_title: 'Multilingual Team',
+      feat_1_body: 'Czech, English, Russian speaking specialists. No language barrier in your beauty journey.',
+      feat_2_title: 'Premium Products',
+      feat_2_body: 'Exclusively professional-grade: Wella, Schwarzkopf, Luxio, Aprés, La Mer Skincare protocols.',
+      feat_3_title: 'Flexible Booking',
+      feat_3_body: 'Online, WhatsApp, Instagram DM or walk-in welcome. Evening & weekend slots available.',
+      tag_balayage: 'Balayage',
+      tag_colour: 'Colour',
+      tag_keratin: 'Keratin',
+      tag_gel: 'Gel System',
+      tag_nail_art: 'Nail Art',
+      tag_biab: 'BIAB',
+      tag_facial: 'Facial',
+      tag_peel: 'Peels',
+      tag_lash: 'Volume Lashes',
+      tag_brow: 'Brows',
+      tag_bridal: 'Bridal',
+      tag_package: 'Packages',
+      from_price: 'From',
+      team_label: 'The Artists',
+      team_title: 'Meet Your Specialists',
+      team_sub: 'Each member of the MSJ atelier holds international certifications and a personal commitment to continuous mastery of their craft.',
+      sp1_role: 'Senior Colourist & Creative Director',
+      sp1_detail: 'With 12 years at the forefront of Czech hair artistry, Monika has shaped colour editorial work for Prague Fashion Week and trained under the legendary L\'Oréal Professionnel Master Colour Academy in Paris. Her signature approach fuses Scandinavian naturalism with bold Central European flair.',
+      sp2_role: 'Nail Architect & Educator',
+      sp2_detail: 'Sofiya is recognised as one of the top nail architects in Central Europe, holding BIAB and Japanese Gel certifications from Tokyo and Vienna. Her work appears in Vogue CS and Elle.cz. She leads MSJ\'s nail education programme.',
+      sp3_role: 'Skin Aesthetician & Wellness Curator',
+      sp3_detail: 'A licensed clinical aesthetician with training in London and Vienna, Jana specialises in advanced skin transformation protocols. Her patient, science-driven approach has earned her a dedicated clientele.',
+      sp4_role: 'Lash Artist & Brow Sculptor',
+      sp4_detail: 'Kristýna brings architectural precision to every lash set and brow design. She is certified in Russian Volume, Classic, Hybrid and Mega Volume lash application, and holds IBBD accreditation for brow design.',
+      sp5_role: 'Hair Stylist & Texture Specialist',
+      sp5_detail: 'Elena\'s mastery over hair texture and movement is unparalleled. Trained in Kyiv, Berlin and Milan, she is a certified Keratin Complex and Olaplex Pro stylist.',
+      sp6_role: 'Makeup Artist & Beauty Consultant',
+      sp6_detail: 'Tereza\'s background spans editorial, film, and high-end wedding makeup across Prague, Vienna and Dubai. She carries advanced certifications in airbrush technique and corrective makeup.',
+      book_label: 'Reserve Your Time',
+      book_title: 'Begin Your Transformation',
+      book_sub: 'Prague · Rybná 716/24 · By appointment & walk-in',
+      book_whatsapp: 'WhatsApp Booking',
+      book_email: 'Send Email',
+      loc_label: 'Find Us',
+      loc_title: 'At the Heart of Prague',
+      loc_detail: 'Step into our atelier moments from the Old Town Square. Easily accessible via metro Náměstí Republiky (Line B) — a 2-minute walk.',
+      day_mon: 'Monday', day_tue: 'Tuesday', day_wed: 'Wednesday',
+      day_thu: 'Thursday', day_fri: 'Friday', day_sat: 'Saturday', day_sun: 'Sunday',
+      closed: 'Closed',
+      footer_desc: 'Premium Hair Art, Bespoke Nail Architecture & Advanced Skin Aesthetics in the heart of Prague.',
+      footer_services: 'Services', footer_contact: 'Contact', footer_legal: 'Info',
+      hair_art: 'Hair Art & Colour', nail_arch: 'Nail Architecture', skin_aes: 'Skin Aesthetics',
+      lash_brow: 'Lash & Brow', bridal_pkg: 'Bridal Packages',
+      privacy: 'Privacy Policy', terms: 'Terms of Service', cookies: 'Cookie Settings', gift_card: 'Gift Cards',
+      footer_made: 'Crafted with precision in Prague.'
+    },
+    cz: {
+      nav_about: 'O nás',
+      nav_services: 'Služby',
+      nav_team: 'Tým',
+      nav_location: 'Kde nás najdete',
+      nav_book: 'Rezervace',
+      hero_eyebrow: 'Přední beauty destinace Prahy',
+      hero_sub: 'Vlasy · Nehty · Estetika',
+      hero_cta_book: 'Rezervovat návštěvu',
+      hero_cta_explore: 'Prozkoumejte služby',
+      phil_label: 'Naše filozofie',
+      phil_quote: 'Krása není luxus. Je to jazyk, rituál, tichý akt sebepotvrzení.',
+      phil_body: 'V MSJ Beauty Studio je každé sezení jedinečnou cestou. Naše studio v srdci historického Starého Města propojuje středoevropskou preciznost s nejnovějšími světovými trendy.',
+      stat_years: 'Let mistrovství',
+      stat_clients: 'Spokojených klientek',
+      stat_artists: 'Specialistů',
+      stat_awards: 'Oborových ocenění',
+      serv_label: 'Naše řemeslo',
+      serv_title: 'Umění dokonalé krásy',
+      serv_hair_title: 'Prémiová vlasová tvorba a barvení',
+      serv_hair_desc: 'Naši barevní mistři využívají nejpokročilejší evropské techniky pigmentace — od ručně malovaného balayage a přesného foilayage po módní barvy a bespoke tónování.',
+      serv_nail_title: 'Bespoke nehtová architektura',
+      serv_nail_desc: 'Nehty jsou skulptura. Naši technici pracují s japonskými gelovými systémy, BIAB překryvy a luxusními chromovými prášky.',
+      serv_skin_title: 'Pokročilá pleťová estetika',
+      serv_skin_desc: 'Klinické pleťové protokoly včetně HydraFacial, mikrojehličkování, LED fototerapie a bespoke peelingů — přizpůsobené vaší pleti.',
+      serv_lash_title: 'Design řas a obočí',
+      serv_lash_desc: 'Ohraničte svůj obličej s architektonickou přesností. Ruský volume, hybridní sady, laminace, tónování a vlastní tvarování obočí.',
+      serv_ritual_title: 'Luxusní beauty rituály',
+      serv_ritual_desc: 'Celodenní a půldenní balíčky kombinující vlasy, nehty, péči o pleť a wellness. Pro nevěsty, zvláštní příležitosti nebo ty, kteří chtějí kompletní proměnu.',
+      serv_exp_title: 'Proč je MSJ jiné',
+      serv_exp_desc: 'Ve městě starosvětské elegance budujeme krásu nového světa. MSJ není jen salon — je to kurátorský prostor, kde je každá návštěva multi-smyslovým rituálem.',
+      feat_1_title: 'Vícejazyčný tým',
+      feat_1_body: 'Specialisté hovořící česky, anglicky a rusky. Žádná jazyková bariéra.',
+      feat_2_title: 'Prémiové produkty',
+      feat_2_body: 'Výhradně profesionální značky: Wella, Schwarzkopf, Luxio, Aprés, La Mer.',
+      feat_3_title: 'Flexibilní rezervace',
+      feat_3_body: 'Online, WhatsApp, Instagram DM nebo příchod bez rezervace. Večerní a víkendové termíny k dispozici.',
+      tag_balayage: 'Balayage', tag_colour: 'Barvení', tag_keratin: 'Keratin',
+      tag_gel: 'Gel systém', tag_nail_art: 'Nehtový design', tag_biab: 'BIAB',
+      tag_facial: 'Ošetření pleti', tag_peel: 'Peeling',
+      tag_lash: 'Volume řasy', tag_brow: 'Obočí',
+      tag_bridal: 'Nevěsty', tag_package: 'Balíčky',
+      from_price: 'Od',
+      team_label: 'Umělci',
+      team_title: 'Seznamte se s našimi specialisty',
+      team_sub: 'Každý člen ateliéru MSJ má mezinárodní certifikace a osobní závazek k neustálému zdokonalování svého řemesla.',
+      sp1_role: 'Senior Koloristka & Kreativní ředitelka',
+      sp1_detail: 'S 12 lety na čele české vlasové tvorby utvářela Monika barevnou editorialovou práci pro Prague Fashion Week a trénovala v L\'Oréal Professionnel Colour Academy v Paříži.',
+      sp2_role: 'Nehtová architektka & Vzdělávatelka',
+      sp2_detail: 'Sofiya je uznávána jako jedna z nejlepších nehtových architektek v Střední Evropě, s certifikacemi BIAB a japonského gelu z Tokia a Vídně.',
+      sp3_role: 'Estetička pleti & Kurátorka wellness',
+      sp3_detail: 'Licencovaná klinická estetička se školením v Londýně a Vídni, Jana se specializuje na pokročilé protokoly transformace pleti.',
+      sp4_role: 'Řasová umělkyně & Sochařka obočí',
+      sp4_detail: 'Kristýna přináší architektonickou přesnost do každé sady řas a designu obočí. Certifikovaná v Russian Volume, Classic, Hybrid a Mega Volume aplikaci.',
+      sp5_role: 'Kadeřnice & Specialistka na texturu',
+      sp5_detail: 'Elenina mistrovství nad vlasovou texturou a pohybem nemá v studiu obdoby. Školena v Kyjevě, Berlíně a Miláně.',
+      sp6_role: 'Vizážistka & Beauty konzultantka',
+      sp6_detail: 'Terezino pozadí zahrnuje editoriální, filmový a high-end svatební makeup v Praze, Vídni a Dubaji.',
+      book_label: 'Rezervujte si čas',
+      book_title: 'Začněte svou proměnu',
+      book_sub: 'Praha · Rybná 716/24 · Rezervace i bez termínu',
+      book_whatsapp: 'Rezervace přes WhatsApp',
+      book_email: 'Napište nám email',
+      loc_label: 'Kde nás najdete',
+      loc_title: 'V srdci Prahy',
+      loc_detail: 'Vstupte do našeho ateliéru kousek od Staroměstského náměstí. Snadno dostupné metrem Náměstí Republiky (linka B) — 2 minuty chůze.',
+      day_mon: 'Pondělí', day_tue: 'Úterý', day_wed: 'Středa',
+      day_thu: 'Čtvrtek', day_fri: 'Pátek', day_sat: 'Sobota', day_sun: 'Neděle',
+      closed: 'Zavřeno',
+      footer_desc: 'Prémiová vlasová tvorba, nehtová architektura a pokročilá estetika pleti v srdci Prahy.',
+      footer_services: 'Služby', footer_contact: 'Kontakt', footer_legal: 'Informace',
+      hair_art: 'Vlasy & Barvení', nail_arch: 'Nehtová architektura', skin_aes: 'Estetika pleti',
+      lash_brow: 'Řasy & Obočí', bridal_pkg: 'Nevěstiny balíčky',
+      privacy: 'Ochrana soukromí', terms: 'Podmínky', cookies: 'Cookies', gift_card: 'Dárkové poukazy',
+      footer_made: 'Vytvořeno s precizností v Praze.'
+    },
+    ru: {
+      nav_about: 'О нас',
+      nav_services: 'Услуги',
+      nav_team: 'Команда',
+      nav_location: 'Местоположение',
+      nav_book: 'Запись',
+      hero_eyebrow: 'Премиальная бьюти-студия Праги',
+      hero_sub: 'Волосы · Ногти · Эстетика',
+      hero_cta_book: 'Записаться',
+      hero_cta_explore: 'Наши услуги',
+      phil_label: 'Наша философия',
+      phil_quote: 'Красота — не роскошь. Это язык, ритуал, тихий акт самовыражения.',
+      phil_body: 'В MSJ Beauty Studio каждый визит — это уникальное путешествие. Наше ателье в историческом центре Праги объединяет центральноевропейскую точность с новейшими мировыми тенденциями в эстетике.',
+      stat_years: 'Лет мастерства',
+      stat_clients: 'Довольных клиенток',
+      stat_artists: 'Специалистов',
+      stat_awards: 'Отраслевых наград',
+      serv_label: 'Наше мастерство',
+      serv_title: 'Искусство безупречной красоты',
+      serv_hair_title: 'Премиальное окрашивание и уход',
+      serv_hair_desc: 'Наши мастера-колористы используют самые передовые европейские техники пигментации — ручной балаяж, точный фойлаяж, яркое окрашивание и индивидуальное тонирование.',
+      serv_nail_title: 'Авторский дизайн ногтей',
+      serv_nail_desc: 'Ногти — это скульптура. Наши мастера работают с японскими гелевыми системами, BIAB-покрытиями и хромовыми пудрами люкс-класса.',
+      serv_skin_title: 'Передовая эстетика кожи',
+      serv_skin_desc: 'Клинические процедуры для лица, включая HydraFacial, микронидлинг, LED-фототерапию и индивидуальные пилинги — подобранные под вашу кожу.',
+      serv_lash_title: 'Дизайн ресниц и бровей',
+      serv_lash_desc: 'Оформите лицо с архитектурной точностью. Русский объём, гибридные наращивания, ламинирование, тонирование и авторская коррекция бровей.',
+      serv_ritual_title: 'Люксовые бьюти-ритуалы',
+      serv_ritual_desc: 'Индивидуальные пакеты на полный и половину дня, объединяющие уход за волосами, ногтями, кожей и велнесс. Для невест, особых случаев или полного преображения.',
+      serv_exp_title: 'Чем MSJ отличается',
+      serv_exp_desc: 'В городе старосветской элегантности мы создаём красоту нового мира. MSJ — это не просто салон, это пространство, где каждый визит — многосенсорный ритуал.',
+      feat_1_title: 'Многоязычная команда',
+      feat_1_body: 'Специалисты говорят на чешском, английском и русском языках.',
+      feat_2_title: 'Премиальные продукты',
+      feat_2_body: 'Только профессиональные марки: Wella, Schwarzkopf, Luxio, Aprés, La Mer.',
+      feat_3_title: 'Гибкая запись',
+      feat_3_body: 'Онлайн, WhatsApp, Instagram DM или без записи. Вечерние и выходные слоты.',
+      tag_balayage: 'Балаяж', tag_colour: 'Окрашивание', tag_keratin: 'Кератин',
+      tag_gel: 'Гель-система', tag_nail_art: 'Дизайн ногтей', tag_biab: 'BIAB',
+      tag_facial: 'Уход за лицом', tag_peel: 'Пилинги',
+      tag_lash: 'Наращивание ресниц', tag_brow: 'Брови',
+      tag_bridal: 'Свадебное', tag_package: 'Пакеты',
+      from_price: 'От',
+      team_label: 'Художники',
+      team_title: 'Знакомьтесь с нашими специалистами',
+      team_sub: 'Каждый член команды MSJ имеет международные сертификаты и личную приверженность постоянному совершенствованию своего мастерства.',
+      sp1_role: 'Старший колорист и Креативный директор',
+      sp1_detail: 'За 12 лет на передовой чешской парикмахерской сферы Моника участвовала в создании цветового направления для Prague Fashion Week и проходила обучение в академии L\'Oréal Professionnel в Париже.',
+      sp2_role: 'Мастер по ногтям и Педагог',
+      sp2_detail: 'София признана одним из ведущих мастеров ногтевой архитектуры в Центральной Европе с сертификатами BIAB и японского геля из Токио и Вены.',
+      sp3_role: 'Эстетист кожи и Куратор велнесс',
+      sp3_detail: 'Лицензированный клинический эстетист с обучением в Лондоне и Вене, Яна специализируется на передовых протоколах трансформации кожи.',
+      sp4_role: 'Мастер по ресницам и бровям',
+      sp4_detail: 'Кристина привносит архитектурную точность в каждый набор ресниц. Сертифицирована по Russian Volume, Classic, Hybrid и Mega Volume.',
+      sp5_role: 'Парикмахер и специалист по текстуре',
+      sp5_detail: 'Мастерство Елены в работе с текстурой и движением волос не имеет себе равных. Обучалась в Киеве, Берлине и Милане.',
+      sp6_role: 'Визажист и Бьюти-консультант',
+      sp6_detail: 'В портфолио Терезы — редакционный, кинематографический и свадебный макияж в Праге, Вене и Дубае.',
+      book_label: 'Запишитесь',
+      book_title: 'Начните своё преображение',
+      book_sub: 'Прага · Rybná 716/24 · Запись и приём без записи',
+      book_whatsapp: 'Запись через WhatsApp',
+      book_email: 'Написать на почту',
+      loc_label: 'Найти нас',
+      loc_title: 'В сердце Праги',
+      loc_detail: 'Наше ателье находится в нескольких шагах от Староместской площади. Метро Náměstí Republiky (линия B) — 2 минуты пешком.',
+      day_mon: 'Понедельник', day_tue: 'Вторник', day_wed: 'Среда',
+      day_thu: 'Четверг', day_fri: 'Пятница', day_sat: 'Суббота', day_sun: 'Воскресенье',
+      closed: 'Закрыто',
+      footer_desc: 'Премиальный уход за волосами, авторский дизайн ногтей и передовая эстетика кожи в сердце Праги.',
+      footer_services: 'Услуги', footer_contact: 'Контакты', footer_legal: 'Информация',
+      hair_art: 'Волосы и окрашивание', nail_arch: 'Дизайн ногтей', skin_aes: 'Эстетика кожи',
+      lash_brow: 'Ресницы и брови', bridal_pkg: 'Свадебные пакеты',
+      privacy: 'Конфиденциальность', terms: 'Условия', cookies: 'Cookies', gift_card: 'Подарочные карты',
+      footer_made: 'Создано с точностью в Праге.'
     }
-  });
+  };
+
+  let currentLang = 'en';
+
+  function applyLanguage(lang) {
+    const dict = I18N[lang] || I18N.en;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    currentLang = lang;
+  }
+
   document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.textContent.toLowerCase() === lang) btn.classList.add('active');
-  });
-}
-// Initialize language on load
-setLang('en');
-
-// ======================================================
-// LOADING SCREEN
-// ======================================================
-(function runLoader() {
-  let pct = 0;
-  const bar = document.getElementById('loading-bar');
-  const pctEl = document.getElementById('loading-percent');
-  const loadingEl = document.getElementById('loading');
-  const interval = setInterval(() => {
-    pct += Math.random() * 10 + 5;
-    if (pct >= 100) {
-      pct = 100;
-      clearInterval(interval);
-      bar.style.width = '100%';
-      pctEl.textContent = '100%';
-      setTimeout(() => {
-        loadingEl.style.opacity = '0';
-        setTimeout(() => {
-          loadingEl.style.display = 'none';
-          triggerHeroEntrance();
-        }, 800);
-      }, 400);
-    }
-    bar.style.width = pct + '%';
-    pctEl.textContent = Math.floor(pct) + '%';
-  }, 60);
-})();
-
-// ======================================================
-// THREE.JS SETUP
-// ======================================================
-const container = document.getElementById('canvas-container');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 0);
-renderer.shadowMap.enabled = false;
-container.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0, 4.6); // Fixed initial camera position
-
-// GEOMETRY - Torus Knot (representing continuous flow)
-const geometry = new THREE.TorusKnotGeometry(1.2, 0.32, 180, 24, 2, 3);
-
-// MATERIAL - Liquid Nacre / Pearl Rose-Gold Finish
-const material = new THREE.MeshStandardMaterial({
-  color: 0xfff5ee, // Nacre base color
-  metalness: 0.9,  // High metallic sheen
-  roughness: 0.03  // Very smooth, high gloss
-});
-
-const mesh = new THREE.Mesh(geometry, material);
-mesh.position.set(0, 0, 0); // Fixed center position
-scene.add(mesh);
-
-// COMPENSATED STUDIO LIGHTING for flawless gloss
-const dirLight1 = new THREE.DirectionalLight(0xffffff, 5.5); // Bright white for sharp highlights
-dirLight1.position.set(6, 6, 6);
-scene.add(dirLight1);
-
-const dirLight2 = new THREE.DirectionalLight(0xffb6c1, 4.0); // Intense neon-pink rim glow
-dirLight2.position.set(-6, -2, -4);
-scene.add(dirLight2);
-
-const dirLight3 = new THREE.DirectionalLight(0xe1c4a8, 3.0); // Soft rose-gold accent
-dirLight3.position.set(3, -7, 2);
-scene.add(dirLight3);
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8); // General illumination
-scene.add(ambientLight);
-
-// Additional point lights for dynamic shimmering highlights
-const pointLight1 = new THREE.PointLight(0xffb6c1, 3.5, 15); // Warm pinkish light
-pointLight1.position.set(3.5, 3.5, 4);
-scene.add(pointLight1);
-
-const pointLight2 = new THREE.PointLight(0xe1c4a8, 2.5, 12); // Rose-gold light
-pointLight2.position.set(-3, -4, -2.5);
-scene.add(pointLight2);
-
-// MOUSE TRACKING FOR HERO STATE (Heavy fluid dampening)
-let mouseX = 0, mouseY = 0;
-let targetRotX = 0, targetRotY = 0;
-let currentRotX = 0, currentRotY = 0;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-});
-
-let wireframeActive = false; // Global state for wireframe mode
-
-// GSAP SCROLL TRIGGER SETUP
-gsap.registerPlugin(ScrollTrigger);
-
-// CAMERA ZOOM & MATERIAL TRANSFORMATION (Hero -> Services)
-ScrollTrigger.create({
-  trigger: '#services',
-  start: 'top bottom',
-  end: 'top top',
-  scrub: 1.5, // Luxury cinematic zoom inertia
-  onUpdate: (self) => {
-    const p = self.progress;
-    
-    // Slow cinematic zoom into mesh
-    camera.position.z = THREE.MathUtils.lerp(4.6, 2.0, p * p); // Exponential zoom
-
-    // Trigger wireframe and particle canvas reveal
-    if (p > 0.7 && !wireframeActive) { // Trigger point based on scroll progress
-      wireframeActive = true;
-      // Transition material to wireframe appearance
-      gsap.to(material, { roughness: 0.8, metalness: 0.25, duration: 0.8, ease: 'power2.out' });
-      material.wireframe = true;
-      document.getElementById('diag-canvas').classList.add('visible'); // Show particle canvas
-    } else if (p < 0.5 && wireframeActive) { // Revert if scrolling back up pre-transition
-      wireframeActive = false;
-      gsap.to(material, { roughness: 0.03, metalness: 0.9, duration: 0.6, ease: 'power2.out' });
-      material.wireframe = false;
-      document.getElementById('diag-canvas').classList.remove('visible');
-    }
-  }
-});
-
-// RE-ASSEMBLY TRANSITION (Services exit -> Specialists enter)
-ScrollTrigger.create({
-  trigger: '#specialists',
-  start: 'top 80%',
-  onEnter: () => {
-    // Reset camera to hero state
-    gsap.to(camera.position, { z: 4.6, duration: 1.8, ease: 'power3.out'});
-    
-    // Revert material to solid, glossy state
-    material.wireframe = false;
-    gsap.to(material, { roughness: 0.03, metalness: 0.9, duration: 1.2, ease: 'power3.out' });
-    
-    // Hide particle canvas
-    document.getElementById('diag-canvas').classList.remove('visible');
-  },
-  onLeaveBack: () => { // If scrolling back up past specialists
-    wireframeActive = true;
-    material.wireframe = true;
-    document.getElementById('diag-canvas').classList.add('visible');
-    gsap.to(camera.position, { z: 2.0, duration: 1.8, ease: 'power3.out' }); // Zoom back in
-  }
-});
-
-// KINETIC BENTO FLOW ANIMATION
-ScrollTrigger.create({
-  trigger: '#bento-wrapper',
-  start: 'top 30%',
-  end: 'bottom -20%',
-  scrub: 1.2,
-  onUpdate: (self) => {
-    const p = self.progress;
-    // Diagonal slide (UP and RIGHT)
-    const targetX = p * window.innerWidth * 1.0;
-    const targetY = p * -window.innerHeight * 0.9;
-
-    gsap.to('#bento-grid', {
-      x: targetX,
-      y: targetY,
-      opacity: p < 0.9 ? 1 : Math.max(0, 1 - (p - 0.9) * 10), // Fade out towards end
-      duration: 0.3,
-      ease: 'none'
-    });
-  }
-});
-
-// ======================================================
-// DIAGONAL PARTICLE / LINES CANVAS
-// ======================================================
-const diagCanvas = document.getElementById('diag-canvas');
-const dCtx = diagCanvas.getContext('2d');
-diagCanvas.width = window.innerWidth;
-diagCanvas.height = window.innerHeight;
-
-const PARTICLE_COUNT = 2500;
-const particles = [];
-const MAX_CONNECT_DISTANCE = 90;
-const MAX_TRAIL_LENGTH = 25;
-
-function createParticles() {
-  particles.length = 0;
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
-    particles.push({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      vx: (1.8 + Math.random() * 3.0), // Faster diagonal movement
-      vy: -(1.8 + Math.random() * 3.0), // Moving UPWARDS
-      size: 0.6 + Math.random() * 1.4,
-      alpha: 0.15 + Math.random() * 0.6,
-      color: Math.random() > 0.4 ? 'rgba(244,167,185,' : 'rgba(225,196,168,', // Rose or Gold tint
-      trail: [],
-      trailLength: Math.floor(Math.random() * MAX_TRAIL_LENGTH)
-    });
-  }
-}
-createParticles();
-
-// Data pulse strings for diagonal travel
-const dataPulses = [
-  { text: 'PREMIUM HAIR', x: 50, y: window.innerHeight * 0.8, progress: 0, speed: 2.2, color: 'rgba(244,167,185,' },
-  { text: 'BESPOKE NAILS', x: 200, y: window.innerHeight * 0.9, progress: 0, speed: 2.5, color: 'rgba(225,196,168,' },
-  { text: 'GLOW SKIN', x: 380, y: window.innerHeight * 0.75, progress: 0, speed: 2.0, color: 'rgba(255,255,238,' },
-  { text: 'MSJ STUDIO PRAGUE', x: 100, y: window.innerHeight, progress: 0, speed: 2.8, color: 'rgba(244,167,185,' },
-  { text: 'HAIR COLOR', x: 550, y: window.innerHeight * 0.85, progress: 0, speed: 2.3, color: 'rgba(225,196,168,' },
-  { text: 'NAIL ART', x: 720, y: window.innerHeight * 0.95, progress: 0, speed: 2.6, color: 'rgba(255,255,238,' },
-];
-
-function animateParticles() {
-  if (parseFloat(diagCanvas.style.opacity || 0) < 0.05) { // Only render if visible
-    requestAnimationFrame(animateParticles);
-    return;
-  }
-
-  dCtx.clearRect(0, 0, diagCanvas.width, diagCanvas.height);
-
-  const currentAlpha = parseFloat(diagCanvas.style.opacity || 0);
-
-  // Subtle diagonal grid lines
-  dCtx.save();
-  dCtx.strokeStyle = 'rgba(244,167,185,0.03)';
-  dCtx.lineWidth = 1;
-  const step = 50;
-  for (let x = -diagCanvas.height; x < diagCanvas.width + diagCanvas.height; x += step) {
-    dCtx.beginPath();
-    dCtx.moveTo(x, diagCanvas.height);
-    dCtx.lineTo(x + diagCanvas.height, 0);
-    dCtx.stroke();
-  }
-  dCtx.restore();
-
-  if (currentAlpha < 0.1) { // Skip detailed drawing if very faint
-    requestAnimationFrame(animateParticles);
-    return;
-  }
-
-  // Update & draw particles with trails
-  particles.forEach(p => {
-    p.trail.push({ x: p.x, y: p.y });
-    while (p.trail.length > p.trailLength) p.trail.shift();
-
-    p.x += p.vx;
-    p.y += p.vy;
-
-    // Wrap around screen
-    if (p.x > diagCanvas.width + p.size * 2 ) p.x = -p.size * 2;
-    if (p.y < -p.size * 2) p.y = diagCanvas.height + p.size * 2;
-
-    // Draw trail
-    if (p.trail.length > 1) {
-      for (let i = 1; i < p.trail.length; i++) {
-        const trailAlpha = (i / p.trail.length) * p.alpha * 0.5 * currentAlpha;
-        dCtx.beginPath();
-        dCtx.strokeStyle = p.color.replace(',', `, ${trailAlpha})`);
-        dCtx.lineWidth = p.size * (i / p.trail.length) * (0.6 + 0.4 * currentAlpha);
-        dCtx.moveTo(p.trail[i - 1].x, p.trail[i - 1].y);
-        dCtx.lineTo(p.trail[i].x, p.trail[i].y);
-        dCtx.stroke();
-      }
-    }
-
-    // Draw particle dot
-    dCtx.beginPath();
-    dCtx.arc(p.x, p.y, p.size * (0.8 + 0.2 * currentAlpha), 0, Math.PI * 2);
-    dCtx.fillStyle = p.color.replace(',', `, ${p.alpha * currentAlpha})`);
-    dCtx.shadowBlur = 6 * currentAlpha;
-    dCtx.shadowColor = p.color.replace(',', ', 0.7)');
-    dCtx.fill();
-    dCtx.shadowBlur = 0;
+    btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
   });
 
-  // Draw connecting lines
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < MAX_CONNECT_DISTANCE) {
-        const alpha = (1 - dist / MAX_CONNECT_DISTANCE) * 0.1 * currentAlpha;
-        dCtx.beginPath();
-        dCtx.strokeStyle = `rgba(244,167,185,${ alpha * 0.7})`; // Rose-tinted lines
-        dCtx.lineWidth = 0.5 * (0.7 + 0.3 * currentAlpha);
-        dCtx.moveTo(particles[i].x, particles[i].y);
-        dCtx.lineTo(particles[j].x, particles[j].y);
-        dCtx.stroke();
-      }
-    }
-  }
-
-  // Animate data pulses
-  dataPulses.forEach(pulse => {
-    pulse.progress += pulse.speed;
-    const px = pulse.x + pulse.progress;
-    const py = pulse.y - pulse.progress;
-
-    if (px > diagCanvas.width + 200 || py < -50) { // Reset if off-screen
-      pulse.progress = 0;
-      pulse.x = 50 + Math.random() * 200;
-      pulse.y = diagCanvas.height * (0.75 + Math.random() * 0.2);
-      pulse.color = Math.random() > 0.5 ? 'rgba(244,167,185,' : 'rgba(225,196,168,';
-    }
-    
-    dCtx.save();
-    dCtx.font = '600 9px monospace';
-    dCtx.letterSpacing = '4px';
-    dCtx.fillStyle = pulse.color.replace(',', `, ${0.5 * currentAlpha})`);
-    dCtx.shadowBlur = 8 * currentAlpha;
-    dCtx.shadowColor = pulse.color.replace(',', ', 0.8)');
-    dCtx.fillText(pulse.text, px, py);
-    dCtx.fillText(pulse.text, px + 1, py + 1);
-    dCtx.restore();
-  });
-
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-// ======================================================
-// ANIMATION LOOP (THREE.JS Renderer)
-// ======================================================
-const clock = new THREE.Clock();
-let lightAngle = 0;
-
-function animate() {
-  requestAnimationFrame(animate);
-  const elapsed = clock.getElapsedTime();
-  lightAngle += 0.008;
-
-  // Smooth mouse tracking with heavy dampening
-  targetRotY = mouseX * 0.6;
-  targetRotX = mouseY * -0.4;
-  currentRotY = THREE.MathUtils.lerp(currentRotY, targetRotY, 0.05);
-  currentRotX = THREE.MathUtils.lerp(currentRotX, targetRotX, 0.05);
-
-  // Continuous auto-rotation + mouse influence
-  mesh.rotation.x = currentRotX + elapsed * 0.08;
-  mesh.rotation.y = currentRotY + elapsed * 0.12;
-  mesh.rotation.z = elapsed * 0.04;
-
-  // Animate helper lights for dynamic reflections
-  pointLight1.position.x = Math.sin(lightAngle) * 4;
-  pointLight1.position.z = Math.cos(lightAngle) * 4;
-  pointLight2.position.x = Math.cos(lightAngle * 1.3) * -3.5;
-  pointLight2.position.y = Math.sin(lightAngle * 0.7) * 3;
-
-  // Subtle knot breathing effect
-  const breathe = 1 + Math.sin(elapsed * 0.9) * 0.015;
-  mesh.scale.setScalar(breathe);
-
-  renderer.render(scene, camera);
-}
-animate();
-
-// ======================================================
-// HERO ENTRANCE ANIMATION
-// ======================================================
-function triggerHeroEntrance() {
-  gsap.to('#hero-eyebrow', { opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 0.2 });
-  gsap.to('#hero-title', { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', delay: 0.5 });
-  gsap.to('#hero-subtitle', { opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 0.9 });
-  gsap.to('#hero-cta', { opacity: 1, y: 0, duration: 1.0, ease: 'power3.out', delay: 1.2 });
-}
-
-// ======================================================
-// BENTO CARD TILT EFFECT (with GSAP for smooth transitions)
-// ======================================================
-document.querySelectorAll('[data-tilt]').forEach(card => {
-  const config = { perspective: 800, speed: 6, ease: 'power2.out' };
-
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-    
-    gsap.to(card, {
-      x: dx * config.speed * 1.5,
-      y: dy * config.speed * 1.5,
-      rotateX: -dy * config.speed * 3,
-      rotateY: dx * config.speed * 3,
-      scale: 1.05,
-      ease: config.ease,
-      duration: 0.5
-    });
-    card.style.boxShadow = `0px ${dy * -10}px ${dx * 15}px rgba(0,0,0,0.2), 0 0 40px rgba(255,182,193,0.1)`;
-  });
-
-  card.addEventListener('mouseleave', () => {
-    gsap.to(card, {
-      x: 0,
-      y: 0,
-      rotateX: 0,
-      rotateY: 0,
-      scale: 1,
-      ease: config.ease,
-      duration: 0.8
-    });
-    card.style.boxShadow = '';
-  });
-});
-
-// ======================================================
-// INTERSECTION OBSERVER — REVEAL ON SCROLL ANIMATION
-// ======================================================
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.reveal-up').forEach(el => revealObserver.observe(el));
-
-// ======================================================
-// WINDOW RESIZE HANDLER
-// ======================================================
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  
-  diagCanvas.width = window.innerWidth;
-  diagCanvas.height = window.innerHeight;
-  createParticles(); // Recreate particles to fit new dimensions
-
-  // Adjust data pulse starting Y positions
-  dataPulses.forEach((p, i) => {
-    p.y = window.innerHeight * (0.75 + i * 0.035);
-  });
-
-  setLang(currentLang); // Re-apply language settings if needed
-});
-
-// ======================================================
-// NAVBAR SCROLL BEHAVIOUR
-// ======================================================
-window.addEventListener('scroll', () => {
+  /* ===========================================================
+     NAVBAR SCROLL EFFECT
+  =========================================================== */
   const navbar = document.getElementById('navbar');
-  if (window.scrollY > 60) {
-    navbar.style.background = 'rgba(10,10,15,0.88)';
-    navbar.style.borderBottomColor = 'rgba(44,44,52,0.75)';
-  } else {
-    navbar.style.background = 'var(--glass-bg)';
-    navbar.style.borderBottomColor = 'var(--glass-border)';
-  }
-});
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
 
-// ======================================================
-// SMOOTH SCROLL FOR ANCHOR LINKS
-// ======================================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function(e) {
-    e.preventDefault();
-    const targetSelector = this.getAttribute('href');
-    if (targetSelector === '#' || targetSelector === '') return;
-    
-    const target = document.querySelector(targetSelector);
-    if (target) {
-      gsap.to(window, {
-        scrollTo: {
-          y: target,
-          autoKill: true
-        },
-        duration: 1.2,
-        ease: "power3.out"
+  /* ===========================================================
+     SCROLL REVEAL
+  =========================================================== */
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  /* ===========================================================
+     STAT COUNT-UP
+  =========================================================== */
+  const statObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseInt(el.dataset.count, 10);
+        let start = 0;
+        const step = Math.ceil(target / 60);
+        const timer = setInterval(() => {
+          start += step;
+          if (start >= target) { start = target; clearInterval(timer); }
+          el.textContent = start.toLocaleString();
+        }, 25);
+        statObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('[data-count]').forEach(el => statObserver.observe(el));
+
+  /* ===========================================================
+     BENTO CARD TILT
+  =========================================================== */
+  document.querySelectorAll('.bento-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transform = `perspective(800px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg) scale(1.012)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) scale(1)';
+      card.style.transition = 'transform 0.5s ease';
+    });
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.08s linear, border-color 0.4s, background 0.4s';
+    });
+  });
+
+  /* ===========================================================
+     THREE.JS SETUP
+  =========================================================== */
+  if (typeof THREE === 'undefined') {
+    console.warn('Three.js not loaded');
+    return;
+  }
+
+  const container = document.getElementById('canvas-container');
+  const renderer  = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  container.appendChild(renderer.domElement);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0, 4.6);
+
+  /* Geometry: luxury torus knot */
+  const geometry = new THREE.TorusKnotGeometry(1.2, 0.32, 180, 24, 2, 3);
+
+  /* Material: Liquid Nacre / Pearl Rose-Gold finish */
+  const material = new THREE.MeshStandardMaterial({
+    color:     0xfff5ee,
+    metalness: 0.9,
+    roughness: 0.03,
+    envMapIntensity: 1.0
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(0, 0, 0);
+  scene.add(mesh);
+
+  /* Lighting */
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 5.5);
+  dirLight1.position.set(6, 6, 6);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0xffb6c1, 4.0);
+  dirLight2.position.set(-6, -2, -4);
+  scene.add(dirLight2);
+
+  const dirLight3 = new THREE.DirectionalLight(0xc9a96e, 2.5);
+  dirLight3.position.set(0, -6, 3);
+  scene.add(dirLight3);
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+  scene.add(ambientLight);
+
+  /* Mouse tracking */
+  const mouse       = { x: 0, y: 0 };
+  const mouseTarget  = { x: 0, y: 0 };
+  const mouseDamped  = { x: 0, y: 0 };
+
+  window.addEventListener('mousemove', e => {
+    mouseTarget.x = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseTarget.y = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+
+  /* Scroll state */
+  let scrollProgress = 0;
+  let wireframeActive = false;
+  let baseRotY = 0;
+  let baseRotX = 0;
+
+  /* ===========================================================
+     2D PARTICLE CANVAS & DIAGONAL MATRIX
+  =========================================================== */
+  const pCanvas  = document.getElementById('particle-canvas');
+  const pCtx     = pCanvas.getContext('2d');
+  let pW = 0, pH = 0;
+
+  const DATA_STRINGS_TEXT = [
+    'PREMIUM HAIR', 'BESPOKE NAILS', 'GLOW SKIN',
+    'MSJ STUDIO PRAGUE', 'RYBNÁ 716/24', 'BEAUTY BY DESIGN',
+    'HAIR ART', 'NAIL ARCHITECTURE', 'SKIN AESTHETICS',
+    'MSJ · PRAGUE', 'ČISTÁ ELEGANCE', 'КРАСОТА'
+  ];
+
+  const NUM_PARTICLES = 2600;
+  let particles = [];
+
+  function resizeParticleCanvas() {
+    pW = pCanvas.width  = window.innerWidth;
+    pH = pCanvas.height = window.innerHeight;
+  }
+
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < NUM_PARTICLES; i++) {
+      particles.push({
+        x:    Math.random() * pW,
+        y:    Math.random() * pH,
+        vx:   0,
+        vy:   0,
+        life: Math.random(),
+        alpha: Math.random() * 0.5 + 0.1,
+        size: Math.random() * 1.5 + 0.3,
+        speed: Math.random() * 2.2 + 0.8
       });
     }
-  });
-});
+  }
 
+  resizeParticleCanvas();
+  initParticles();
+
+  /* Data Strings */
+  const dsContainer = document.getElementById('data-strings-container');
+  const dataStringEls = [];
+
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.classList.add('data-string');
+    el.textContent = DATA_STRINGS_TEXT[i % DATA_STRINGS_TEXT.length];
+    el.style.left  = (Math.random() * 110 - 10) + '%';
+    el.style.top   = (Math.random() * 110 - 10) + '%';
+    el.style.opacity = '0';
+    dsContainer.appendChild(el);
+    dataStringEls.push({
+      el,
+      speed: Math.random() * 1.4 + 0.7,
+      x: Math.random() * pW,
+      y: Math.random() * pH
+    });
+  }
+
+  let matrixMode = false;
+  let matrixProgress = 0;
+
+  function activateMatrix() {
+    if (matrixMode) return;
+    matrixMode = true;
+    pCanvas.classList.add('active');
+    dsContainer.style.opacity = '1';
+    material.wireframe = true;
+  }
+
+  function deactivateMatrix() {
+    if (!matrixMode) return;
+    matrixMode = false;
+    pCanvas.classList.remove('active');
+    dsContainer.style.opacity = '0';
+    material.wireframe = false;
+  }
+
+  function drawParticles(dt) {
+    pCtx.clearRect(0, 0, pW, pH);
+    if (!matrixMode && matrixProgress < 0.01) return;
+
+    const alpha45 = matrixProgress;
+
+    particles.forEach(p => {
+      // Move diagonally: UP and RIGHT at 45 degrees
+      p.x += p.speed * Math.cos(-Math.PI / 4) * dt * 60 * alpha45;
+      p.y += p.speed * Math.sin(-Math.PI / 4) * dt * 60 * alpha45;
+
+      // Wrap around
+      if (p.x > pW + 20)  p.x = -20;
+      if (p.y < -20)       p.y = pH + 20;
+
+      // Draw short diagonal line trail
+      const len = 22 * alpha45;
+      const x2 = p.x - len * Math.cos(-Math.PI / 4);
+      const y2 = p.y - len * Math.sin(-Math.PI / 4);
+
+      pCtx.beginPath();
+      pCtx.moveTo(p.x, p.y);
+      pCtx.lineTo(x2, y2);
+      const grad = pCtx.createLinearGradient(p.x, p.y, x2, y2);
+      grad.addColorStop(0, `rgba(201,169,110,${p.alpha * alpha45})`);
+      grad.addColorStop(0.5, `rgba(255,182,193,${p.alpha * 0.6 * alpha45})`);
+      grad.addColorStop(1, `rgba(201,169,110,0)`);
+      pCtx.strokeStyle = grad;
+      pCtx.lineWidth = p.size * alpha45;
+      pCtx.stroke();
+    });
+
+    // Data string movement
+    dataStringEls.forEach((ds, idx) => {
+      ds.x += ds.speed * Math.cos(-Math.PI / 4) * dt * 60 * alpha45;
+      ds.y += ds.speed * Math.sin(-Math.PI / 4) * dt * 60 * alpha45;
+      if (ds.x > pW + 200) { ds.x = -200; ds.y = Math.random() * pH; }
+      if (ds.y < -40)       { ds.y = pH + 40; ds.x = Math.random() * pW; }
+      ds.el.style.left = ds.x + 'px';
+      ds.el.style.top  = ds.y + 'px';
+      ds.el.style.opacity = (0.5 * alpha45).toString();
+    });
+  }
+
+  /* ===========================================================
+     GSAP SCROLL INTEGRATION
+  =========================================================== */
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Camera zoom on hero scroll
+    ScrollTrigger.create({
+      trigger: '#philosophy',
+      start: 'top 80%',
+      end: 'top 20%',
+      scrub: 1.5,
+      onUpdate(self) {
+        const p = self.progress;
+        camera.position.z = 4.6 - p * 1.8;
+      }
+    });
+
+    // Services -> activate matrix
+    ScrollTrigger.create({
+      trigger: '#services',
+      start: 'top 60%',
+      end: 'bottom 40%',
+      onEnter()  { activateMatrix(); },
+      onLeave()  { deactivateMatrix(); },
+      onEnterBack() { activateMatrix(); },
+      onLeaveBack() { deactivateMatrix(); }
+    });
+
+    // Matrix progress scrub
+    ScrollTrigger.create({
+      trigger: '#services',
+      start: 'top 75%',
+      end: 'top 25%',
+      scrub: 1,
+      onUpdate(self) {
+        matrixProgress = self.progress;
+      }
+    });
+
+    // Bento diagonal slide
+    const bentoGrid = document.getElementById('bento-grid');
+    if (bentoGrid) {
+      ScrollTrigger.create({
+        trigger: '#services',
+        start: 'top top',
+        end: '+=120%',
+        pin: false,
+        scrub: 1.2,
+        onUpdate(self) {
+          const p = Math.min(self.progress * 1.5, 1);
+          // No actual translate — let natural scroll work
+          // But we shift the mesh rotation faster in services
+        }
+      });
+    }
+
+    // Specialists -> mesh comes back solidly
+    ScrollTrigger.create({
+      trigger: '#specialists',
+      start: 'top 65%',
+      onEnter() { deactivateMatrix(); }
+    });
+
+    // Camera reset for specialists
+    ScrollTrigger.create({
+      trigger: '#specialists',
+      start: 'top 80%',
+      end: 'top 30%',
+      scrub: 1.5,
+      onUpdate(self) {
+        const p = self.progress;
+        camera.position.z = 2.8 + p * 1.8; // zoom back out
+      }
+    });
+
+  }
+
+  /* ===========================================================
+     ANIMATION LOOP
+  =========================================================== */
+  let lastTime = 0;
+  let frameId;
+
+  function animate(now) {
+    frameId = requestAnimationFrame(animate);
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    // Damped mouse tracking
+    mouseDamped.x = THREE.MathUtils.lerp(mouseDamped.x, mouseTarget.x, 0.05);
+    mouseDamped.y = THREE.MathUtils.lerp(mouseDamped.y, mouseTarget.y, 0.05);
+
+    // Mesh rotation
+    mesh.rotation.y += 0.003 + mouseDamped.x * 0.008;
+    mesh.rotation.x += 0.001 + mouseDamped.y * 0.005;
+    mesh.rotation.z += 0.0005;
+
+    // Subtle breathing scale
+    const breathe = 1 + Math.sin(now * 0.0008) * 0.018;
+    mesh.scale.setScalar(breathe);
+
+    // Light pulsing for wireframe
+    if (matrixMode) {
+      dirLight2.intensity = 4.0 + Math.sin(now * 0.003) * 1.5;
+      dirLight1.intensity = 5.5 + Math.sin(now * 0.002) * 0.5;
+    } else {
+      dirLight2.intensity = THREE.MathUtils.lerp(dirLight2.intensity, 4.0, 0.05);
+      dirLight1.intensity = THREE.MathUtils.lerp(dirLight1.intensity, 5.5, 0.05);
+    }
+
+    drawParticles(dt);
+    renderer.render(scene, camera);
+  }
+
+  animate(0);
+
+  /* ===========================================================
+     RESIZE
+  =========================================================== */
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    resizeParticleCanvas();
+  }, { passive: true });
+
+})();
 </script>
 </body>
 </html>
-
